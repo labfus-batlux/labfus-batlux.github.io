@@ -21,7 +21,6 @@
     }
     button:hover { background: #1e42cc; }
     button:disabled { background: #ccc; cursor: not-allowed; }
-    button.active { background: #ff5722; }
     #canvas {
       border: 1px solid #ddd;
       cursor: crosshair;
@@ -44,7 +43,6 @@
       <button id="stopBtn" disabled>Stop</button>
       <button id="clearBtn">Clear</button>
       <button id="randomBtn">Random</button>
-      <button id="goBtn" disabled>Apply Go! Rules</button>
       <span class="info">Generation: <span id="generation">0</span></span>
     </div>
 
@@ -60,7 +58,6 @@
     const stopBtn = document.getElementById('stopBtn');
     const clearBtn = document.getElementById('clearBtn');
     const randomBtn = document.getElementById('randomBtn');
-    const goBtn = document.getElementById('goBtn');
     const generationDisplay = document.getElementById('generation');
 
     const cellSize = 10;
@@ -68,17 +65,9 @@
     const rows = canvas.height / cellSize;
 
     let grid = createGrid();
-    let colors = createGrid(); // Store colors for Go mode
     let running = false;
     let generation = 0;
     let intervalId = null;
-    let goMode = false;
-
-    // Color palette for Go stones
-    const goColors = [
-      '#2b59ff', '#ff5722', '#4caf50', '#ff9800',
-      '#9c27b0', '#00bcd4', '#ffeb3b', '#e91e63'
-    ];
 
     function createGrid() {
       return Array(rows).fill(null).map(() => Array(cols).fill(0));
@@ -93,11 +82,7 @@
           ctx.strokeRect(j * cellSize, i * cellSize, cellSize, cellSize);
 
           if (grid[i][j] === 1) {
-            if (goMode && colors[i][j]) {
-              ctx.fillStyle = colors[i][j];
-            } else {
-              ctx.fillStyle = '#2b59ff';
-            }
+            ctx.fillStyle = '#2b59ff';
             ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
           }
         }
@@ -144,7 +129,6 @@
         running = true;
         startBtn.disabled = true;
         stopBtn.disabled = false;
-        goBtn.disabled = true;
         intervalId = setInterval(nextGeneration, 100);
       }
     }
@@ -153,27 +137,20 @@
       running = false;
       startBtn.disabled = false;
       stopBtn.disabled = true;
-      goBtn.disabled = false;
       clearInterval(intervalId);
     }
 
     function clear() {
       stop();
       grid = createGrid();
-      colors = createGrid();
-      goMode = false;
       generation = 0;
       generationDisplay.textContent = generation;
-      goBtn.textContent = 'Apply Go! Rules';
-      goBtn.classList.remove('active');
       drawGrid();
     }
 
     function randomize() {
       stop();
       grid = createGrid();
-      colors = createGrid();
-      goMode = false;
       for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
           grid[i][j] = Math.random() > 0.7 ? 1 : 0;
@@ -181,106 +158,7 @@
       }
       generation = 0;
       generationDisplay.textContent = generation;
-      goBtn.textContent = 'Apply Go! Rules';
-      goBtn.classList.remove('active');
       drawGrid();
-    }
-
-    function applyGoRules() {
-      if (running) return;
-
-      if (!goMode) {
-        // Entering Go mode: assign colors to groups
-        goMode = true;
-        colors = createGrid();
-        const visited = createGrid();
-        let colorIndex = 0;
-
-        for (let i = 0; i < rows; i++) {
-          for (let j = 0; j < cols; j++) {
-            if (grid[i][j] === 1 && visited[i][j] === 0) {
-              const color = goColors[colorIndex % goColors.length];
-              floodFillColor(i, j, color, visited);
-              colorIndex++;
-            }
-          }
-        }
-
-        // Remove groups with no liberties
-        removeGroupsWithoutLiberties();
-
-        goBtn.textContent = 'Return to Conway';
-        goBtn.classList.add('active');
-        drawGrid();
-      } else {
-        // Returning to Conway mode
-        goMode = false;
-        colors = createGrid();
-        goBtn.textContent = 'Apply Go! Rules';
-        goBtn.classList.remove('active');
-        drawGrid();
-      }
-    }
-
-    function floodFillColor(row, col, color, visited) {
-      const stack = [[row, col]];
-
-      while (stack.length > 0) {
-        const [r, c] = stack.pop();
-
-        if (r < 0 || r >= rows || c < 0 || c >= cols) continue;
-        if (visited[r][c] === 1 || grid[r][c] === 0) continue;
-
-        visited[r][c] = 1;
-        colors[r][c] = color;
-
-        stack.push([r - 1, c]);
-        stack.push([r + 1, c]);
-        stack.push([r, c - 1]);
-        stack.push([r, c + 1]);
-      }
-    }
-
-    function getLiberties(row, col, visited, groupCells) {
-      if (row < 0 || row >= rows || col < 0 || col >= cols) return 0;
-      if (visited[row][col] === 1) return 0;
-
-      visited[row][col] = 1;
-
-      if (grid[row][col] === 0) {
-        return 1; // Empty space is a liberty
-      }
-
-      groupCells.push([row, col]);
-
-      let liberties = 0;
-      liberties += getLiberties(row - 1, col, visited, groupCells);
-      liberties += getLiberties(row + 1, col, visited, groupCells);
-      liberties += getLiberties(row, col - 1, visited, groupCells);
-      liberties += getLiberties(row, col + 1, visited, groupCells);
-
-      return liberties;
-    }
-
-    function removeGroupsWithoutLiberties() {
-      const visited = createGrid();
-
-      for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
-          if (grid[i][j] === 1 && visited[i][j] === 0) {
-            const groupCells = [];
-            const liberties = getLiberties(i, j, visited, groupCells);
-
-            if (liberties === 0) {
-              // Remove this group
-              for (const [r, c] of groupCells) {
-                grid[r][c] = 0;
-                colors[r][c] = 0;
-              }
-            }
-          }
-        }
-      }
     }
 
     canvas.addEventListener('click', (e) => {
@@ -303,7 +181,6 @@
     stopBtn.addEventListener('click', stop);
     clearBtn.addEventListener('click', clear);
     randomBtn.addEventListener('click', randomize);
-    goBtn.addEventListener('click', applyGoRules);
 
     // Initial draw
     drawGrid();
