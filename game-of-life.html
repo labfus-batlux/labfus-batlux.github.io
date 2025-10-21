@@ -493,6 +493,17 @@
         }
       }
 
+      // If switching FROM wireworld, convert all non-empty cells to living cells
+      if (gameMode === 'wireworld') {
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            if (grid[i][j] > 0) {
+              grid[i][j] = 1;
+            }
+          }
+        }
+      }
+
       gameMode = 'conway';
       colors = createGrid();
       sandpileValues = createGrid();
@@ -558,11 +569,23 @@
         }
       }
 
+      // If switching FROM wireworld, convert all non-empty cells to living cells
+      if (gameMode === 'wireworld') {
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            if (grid[i][j] > 0) {
+              grid[i][j] = 1;
+            }
+          }
+        }
+      }
+
       gameMode = 'tetris';
       colors = createGrid();
       const visited = createGrid();
       let colorIndex = 0;
 
+      // Assign colors to all existing living cells based on connected components
       for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
           if (grid[i][j] === 1 && visited[i][j] === 0) {
@@ -605,6 +628,17 @@
         for (let i = 0; i < rows; i++) {
           for (let j = 0; j < cols; j++) {
             if (sandpileValues[i][j] > 0) {
+              grid[i][j] = 1;
+            }
+          }
+        }
+      }
+
+      // If switching FROM wireworld, convert all non-empty cells to living cells
+      if (gameMode === 'wireworld') {
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            if (grid[i][j] > 0) {
               grid[i][j] = 1;
             }
           }
@@ -814,7 +848,42 @@
       const row = Math.floor(y / cellSize);
 
       if (row >= 0 && row < rows && col >= 0 && col < cols) {
-        grid[row][col] = grid[row][col] === 1 ? 0 : 1;
+        if (gameMode === 'conway') {
+          grid[row][col] = grid[row][col] === 1 ? 0 : 1;
+        } else if (gameMode === 'go') {
+          if (grid[row][col] === 1) {
+            grid[row][col] = 0;
+            colors[row][col] = 0;
+          } else {
+            grid[row][col] = 1;
+            colors[row][col] = goColors[Math.floor(Math.random() * 2)];
+          }
+        } else if (gameMode === 'tetris') {
+          if (grid[row][col] === 1) {
+            grid[row][col] = 0;
+            colors[row][col] = 0;
+          } else {
+            grid[row][col] = 1;
+            // Assign a random color
+            colors[row][col] = tetrisColors[Math.floor(Math.random() * tetrisColors.length)];
+          }
+        } else if (gameMode === 'ant') {
+          grid[row][col] = grid[row][col] === 1 ? 0 : 1;
+        } else if (gameMode === 'sandpile') {
+          if (sandpileValues[row][col] > 0) {
+            sandpileValues[row][col] = 0;
+            grid[row][col] = 0;
+          } else {
+            sandpileValues[row][col] = Math.floor(Math.random() * 8) + 1;
+            grid[row][col] = 1;
+          }
+        } else if (gameMode === 'wireworld') {
+          if (grid[row][col] === 0) {
+            grid[row][col] = wireworldColors.conductor;
+          } else {
+            grid[row][col] = 0;
+          }
+        }
         drawGrid();
       }
     });
