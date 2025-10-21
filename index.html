@@ -16,17 +16,55 @@
     a { color: #2b59ff; text-decoration: none; }
     a:hover { text-decoration: underline; }
     footer { margin-top: 48px; font-size: 14px; color: #444; }
-    .toggle-btn {
-      padding: 6px 12px;
-      background: #2b59ff;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       margin-bottom: 16px;
     }
-    .toggle-btn:hover { background: #1e42cc; }
+    .toggle-label {
+      font-size: 14px;
+      color: #333;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 48px;
+      height: 24px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .3s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #2b59ff;
+    }
+    input:checked + .slider:before {
+      transform: translateX(24px);
+    }
     #content h1 { font-size: 28px; margin: 0 0 16px; }
     #content h2 { font-size: 20px; margin: 24px 0 12px; }
     #content ul { list-style: none; padding: 0; }
@@ -46,7 +84,13 @@
 </head>
 <body>
   <main class="wrap">
-    <button class="toggle-btn" id="toggleBtn">.md</button>
+    <div class="toggle-container">
+      <span class="toggle-label">.md</span>
+      <label class="switch">
+        <input type="checkbox" id="toggleSwitch">
+        <span class="slider"></span>
+      </label>
+    </div>
     <div id="content"></div>
     <div id="raw-markdown" class="hidden"></div>
 
@@ -75,21 +119,18 @@
       });
 
     // Toggle between rendered and raw markdown
-    document.getElementById('toggleBtn').addEventListener('click', function() {
+    document.getElementById('toggleSwitch').addEventListener('change', function() {
       const content = document.getElementById('content');
       const raw = document.getElementById('raw-markdown');
-      const btn = document.getElementById('toggleBtn');
 
-      showingRaw = !showingRaw;
+      showingRaw = this.checked;
 
       if (showingRaw) {
         content.classList.add('hidden');
         raw.classList.remove('hidden');
-        btn.textContent = 'Show Rendered';
       } else {
         content.classList.remove('hidden');
         raw.classList.add('hidden');
-        btn.textContent = 'Show Raw Markdown';
       }
     });
 
