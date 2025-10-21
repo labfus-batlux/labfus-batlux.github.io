@@ -249,11 +249,18 @@
         }
       }
 
-      const shapeMovements = {}; // Track which shapes can move
-      const stationaryShapes = new Set(); // Track shapes that won't move
+      // Build new grid by checking each shape independently
+      const newGrid = createGrid();
+      const newColors = createGrid();
 
-      // First pass: determine which shapes are blocked (can't move)
-      for (const color in colorToShape) {
+      // Sort shapes by their lowest row (process from bottom to top)
+      const sortedColors = Object.keys(colorToShape).sort((a, b) => {
+        const maxRowA = Math.max(...colorToShape[a].map(([r, c]) => r));
+        const maxRowB = Math.max(...colorToShape[b].map(([r, c]) => r));
+        return maxRowB - maxRowA;
+      });
+
+      for (const color of sortedColors) {
         const shapeCells = colorToShape[color];
         let canMoveDown = true;
 
@@ -269,57 +276,16 @@
           const isCellBelowInSameShape = shapeCells.some(([sr, sc]) => sr === cellBelow[0] && sc === cellBelow[1]);
 
           if (!isCellBelowInSameShape) {
-            // Check if there's already a cell from the current grid below (not part of this shape)
-            const cellBelowColor = colors[r + 1][c];
-            if (grid[r + 1][c] === 1 && cellBelowColor !== color) {
+            // Check if the new grid already has something there (from a shape we've already placed)
+            if (newGrid[r + 1][c] === 1) {
               canMoveDown = false;
               break;
             }
           }
         }
 
-        shapeMovements[color] = canMoveDown;
-        if (!canMoveDown) {
-          stationaryShapes.add(color);
-        }
-      }
-
-      // Second pass: recheck moving shapes against stationary shapes
-      for (const color in colorToShape) {
-        if (shapeMovements[color]) {
-          const shapeCells = colorToShape[color];
-
-          // Check if this moving shape would collide with any stationary shape
-          for (const [r, c] of shapeCells) {
-            const cellBelow = [r + 1, c];
-            const isCellBelowInSameShape = shapeCells.some(([sr, sc]) => sr === cellBelow[0] && sc === cellBelow[1]);
-
-            if (!isCellBelowInSameShape) {
-              // Check against all stationary shapes
-              for (const stationaryColor of stationaryShapes) {
-                const stationaryCells = colorToShape[stationaryColor];
-                const collides = stationaryCells.some(([sr, sc]) => sr === r + 1 && sc === c);
-                if (collides) {
-                  shapeMovements[color] = false;
-                  stationaryShapes.add(color);
-                  break;
-                }
-              }
-              if (!shapeMovements[color]) break;
-            }
-          }
-        }
-      }
-
-      // Third pass: build new grid based on movements
-      const newGrid = createGrid();
-      const newColors = createGrid();
-
-      for (const color in colorToShape) {
-        const shapeCells = colorToShape[color];
-        const canMove = shapeMovements[color];
-
-        if (canMove) {
+        // Place shape in new grid
+        if (canMoveDown) {
           // Move shape down
           for (const [r, c] of shapeCells) {
             newGrid[r + 1][c] = 1;
