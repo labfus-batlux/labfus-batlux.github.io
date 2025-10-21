@@ -249,11 +249,10 @@
         }
       }
 
-      // Create a set of all cells that will be occupied (to check collisions)
-      const willBeOccupied = new Set();
       const shapeMovements = {}; // Track which shapes can move
+      const stationaryShapes = new Set(); // Track shapes that won't move
 
-      // First pass: determine which shapes can move
+      // First pass: determine which shapes are blocked (can't move)
       for (const color in colorToShape) {
         const shapeCells = colorToShape[color];
         let canMoveDown = true;
@@ -280,9 +279,39 @@
         }
 
         shapeMovements[color] = canMoveDown;
+        if (!canMoveDown) {
+          stationaryShapes.add(color);
+        }
       }
 
-      // Second pass: build new grid based on movements
+      // Second pass: recheck moving shapes against stationary shapes
+      for (const color in colorToShape) {
+        if (shapeMovements[color]) {
+          const shapeCells = colorToShape[color];
+
+          // Check if this moving shape would collide with any stationary shape
+          for (const [r, c] of shapeCells) {
+            const cellBelow = [r + 1, c];
+            const isCellBelowInSameShape = shapeCells.some(([sr, sc]) => sr === cellBelow[0] && sc === cellBelow[1]);
+
+            if (!isCellBelowInSameShape) {
+              // Check against all stationary shapes
+              for (const stationaryColor of stationaryShapes) {
+                const stationaryCells = colorToShape[stationaryColor];
+                const collides = stationaryCells.some(([sr, sc]) => sr === r + 1 && sc === c);
+                if (collides) {
+                  shapeMovements[color] = false;
+                  stationaryShapes.add(color);
+                  break;
+                }
+              }
+              if (!shapeMovements[color]) break;
+            }
+          }
+        }
+      }
+
+      // Third pass: build new grid based on movements
       const newGrid = createGrid();
       const newColors = createGrid();
 
