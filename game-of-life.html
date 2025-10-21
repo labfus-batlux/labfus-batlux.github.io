@@ -44,6 +44,7 @@
       <button id="stopBtn" disabled>Stop</button>
       <button id="clearBtn">Clear</button>
       <button id="randomBtn">Random</button>
+      <span class="info">Speed: <input type="range" id="speedSlider" min="1" max="20" value="10" style="width: 100px; vertical-align: middle;"></span>
       <span class="info">Generation: <span id="generation">0</span></span>
     </div>
     <div class="controls">
@@ -74,6 +75,7 @@
     const sandpileBtn = document.getElementById('sandpileBtn');
     const wireworldBtn = document.getElementById('wireworldBtn');
     const generationDisplay = document.getElementById('generation');
+    const speedSlider = document.getElementById('speedSlider');
 
     const gameButtons = [conwayBtn, goBtn, tetrisBtn, antBtn, sandpileBtn, wireworldBtn];
 
@@ -419,13 +421,21 @@
       grid = newGrid;
     }
 
+    function getSpeed() {
+      // Convert slider value (1-20) to interval time in ms
+      // Higher slider value = faster speed = lower interval
+      // 1 = 500ms (slow), 10 = 100ms (medium), 20 = 25ms (fast)
+      const sliderValue = parseInt(speedSlider.value);
+      return Math.max(25, 525 - sliderValue * 25);
+    }
+
     function start() {
       if (!running) {
         running = true;
         startBtn.disabled = true;
         stopBtn.disabled = false;
         gameButtons.forEach(btn => btn.disabled = true);
-        intervalId = setInterval(nextGeneration, gameMode === 'ant' ? 50 : 100);
+        intervalId = setInterval(nextGeneration, getSpeed());
       }
     }
 
@@ -435,6 +445,13 @@
       stopBtn.disabled = true;
       gameButtons.forEach(btn => btn.disabled = false);
       clearInterval(intervalId);
+    }
+
+    function updateSpeed() {
+      if (running) {
+        clearInterval(intervalId);
+        intervalId = setInterval(nextGeneration, getSpeed());
+      }
     }
 
     function clear() {
@@ -898,6 +915,7 @@
     antBtn.addEventListener('click', applyAnt);
     sandpileBtn.addEventListener('click', applySandpile);
     wireworldBtn.addEventListener('click', applyWireworld);
+    speedSlider.addEventListener('input', updateSpeed);
 
     // Initial draw
     drawGrid();
