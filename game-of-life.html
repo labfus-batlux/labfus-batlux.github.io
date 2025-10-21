@@ -234,17 +234,17 @@
     }
 
     function nextTetris() {
-      // Identify all unique shapes by color
-      const colorToShape = {};
+      // Identify all connected shapes (not just by color, but by connectivity)
+      const visited = createGrid();
+      const shapes = [];
 
       for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
-          if (grid[i][j] === 1 && colors[i][j]) {
+          if (grid[i][j] === 1 && visited[i][j] === 0) {
+            const shapeCells = [];
             const color = colors[i][j];
-            if (!colorToShape[color]) {
-              colorToShape[color] = [];
-            }
-            colorToShape[color].push([i, j]);
+            floodFillTetrisShape(i, j, color, visited, shapeCells);
+            shapes.push({ cells: shapeCells, color: color });
           }
         }
       }
@@ -254,14 +254,15 @@
       const newColors = createGrid();
 
       // Sort shapes by their lowest row (process from bottom to top)
-      const sortedColors = Object.keys(colorToShape).sort((a, b) => {
-        const maxRowA = Math.max(...colorToShape[a].map(([r, c]) => r));
-        const maxRowB = Math.max(...colorToShape[b].map(([r, c]) => r));
+      shapes.sort((a, b) => {
+        const maxRowA = Math.max(...a.cells.map(([r, c]) => r));
+        const maxRowB = Math.max(...b.cells.map(([r, c]) => r));
         return maxRowB - maxRowA;
       });
 
-      for (const color of sortedColors) {
-        const shapeCells = colorToShape[color];
+      for (const shape of shapes) {
+        const shapeCells = shape.cells;
+        const color = shape.color;
         let canMoveDown = true;
 
         // Check if entire shape can move down
@@ -320,6 +321,20 @@
 
       grid = newGrid;
       colors = newColors;
+    }
+
+    function floodFillTetrisShape(row, col, color, visited, shapeCells) {
+      if (row < 0 || row >= rows || col < 0 || col >= cols) return;
+      if (visited[row][col] === 1 || grid[row][col] === 0) return;
+      if (colors[row][col] !== color) return;
+
+      visited[row][col] = 1;
+      shapeCells.push([row, col]);
+
+      floodFillTetrisShape(row - 1, col, color, visited, shapeCells);
+      floodFillTetrisShape(row + 1, col, color, visited, shapeCells);
+      floodFillTetrisShape(row, col - 1, color, visited, shapeCells);
+      floodFillTetrisShape(row, col + 1, color, visited, shapeCells);
     }
 
     function nextAnt() {
