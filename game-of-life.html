@@ -44,12 +44,15 @@
       <button id="stopBtn" disabled>Stop</button>
       <button id="clearBtn">Clear</button>
       <button id="randomBtn">Random</button>
-      <button id="goBtn" disabled>Go!</button>
-      <button id="tetrisBtn" disabled>Tetris</button>
-      <button id="antBtn" disabled>Langton's Ant</button>
-      <button id="sandpileBtn" disabled>Sandpile</button>
-      <button id="wireworldBtn" disabled>Wireworld</button>
       <span class="info">Generation: <span id="generation">0</span></span>
+    </div>
+    <div class="controls">
+      <button id="conwayBtn" class="active">Conway</button>
+      <button id="goBtn">Go!</button>
+      <button id="tetrisBtn">Tetris</button>
+      <button id="antBtn">Langton's Ant</button>
+      <button id="sandpileBtn">Sandpile</button>
+      <button id="wireworldBtn">Wireworld</button>
     </div>
 
     <canvas id="canvas" width="600" height="400"></canvas>
@@ -64,12 +67,15 @@
     const stopBtn = document.getElementById('stopBtn');
     const clearBtn = document.getElementById('clearBtn');
     const randomBtn = document.getElementById('randomBtn');
+    const conwayBtn = document.getElementById('conwayBtn');
     const goBtn = document.getElementById('goBtn');
     const tetrisBtn = document.getElementById('tetrisBtn');
     const antBtn = document.getElementById('antBtn');
     const sandpileBtn = document.getElementById('sandpileBtn');
     const wireworldBtn = document.getElementById('wireworldBtn');
     const generationDisplay = document.getElementById('generation');
+
+    const gameButtons = [conwayBtn, goBtn, tetrisBtn, antBtn, sandpileBtn, wireworldBtn];
 
     const cellSize = 10;
     const cols = canvas.width / cellSize;
@@ -347,11 +353,7 @@
         running = true;
         startBtn.disabled = true;
         stopBtn.disabled = false;
-        goBtn.disabled = true;
-        tetrisBtn.disabled = true;
-        antBtn.disabled = true;
-        sandpileBtn.disabled = true;
-        wireworldBtn.disabled = true;
+        gameButtons.forEach(btn => btn.disabled = true);
         intervalId = setInterval(nextGeneration, gameMode === 'ant' ? 50 : 100);
       }
     }
@@ -360,11 +362,7 @@
       running = false;
       startBtn.disabled = false;
       stopBtn.disabled = true;
-      goBtn.disabled = false;
-      tetrisBtn.disabled = false;
-      antBtn.disabled = false;
-      sandpileBtn.disabled = false;
-      wireworldBtn.disabled = false;
+      gameButtons.forEach(btn => btn.disabled = false);
       clearInterval(intervalId);
     }
 
@@ -376,7 +374,7 @@
       gameMode = 'conway';
       generation = 0;
       generationDisplay.textContent = generation;
-      resetButtons();
+      setActiveGameButton(conwayBtn);
       drawGrid();
     }
 
@@ -393,81 +391,65 @@
       }
       generation = 0;
       generationDisplay.textContent = generation;
-      resetButtons();
+      setActiveGameButton(conwayBtn);
       drawGrid();
     }
 
-    function resetButtons() {
-      goBtn.textContent = 'Go!';
-      goBtn.classList.remove('active');
-      tetrisBtn.textContent = 'Tetris';
-      tetrisBtn.classList.remove('active');
-      antBtn.textContent = "Langton's Ant";
-      antBtn.classList.remove('active');
-      sandpileBtn.textContent = 'Sandpile';
-      sandpileBtn.classList.remove('active');
-      wireworldBtn.textContent = 'Wireworld';
-      wireworldBtn.classList.remove('active');
+    function setActiveGameButton(activeBtn) {
+      gameButtons.forEach(btn => {
+        btn.classList.remove('active');
+        btn.disabled = (btn !== activeBtn);
+      });
+      activeBtn.classList.add('active');
+      activeBtn.disabled = false;
     }
 
-    function applyGoRules() {
+    function applyConway() {
       if (running) return;
+      gameMode = 'conway';
+      colors = createGrid();
+      sandpileValues = createGrid();
+      setActiveGameButton(conwayBtn);
+      drawGrid();
+    }
 
-      if (gameMode !== 'go') {
-        gameMode = 'go';
-        colors = createGrid();
+    function applyGo() {
+      if (running) return;
+      gameMode = 'go';
+      colors = createGrid();
 
-        for (let i = 0; i < rows; i++) {
-          for (let j = 0; j < cols; j++) {
-            if (grid[i][j] === 1) {
-              colors[i][j] = goColors[Math.floor(Math.random() * 2)];
-            }
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          if (grid[i][j] === 1) {
+            colors[i][j] = goColors[Math.floor(Math.random() * 2)];
           }
         }
-
-        removeGroupsWithoutLiberties();
-
-        goBtn.textContent = 'Return to Conway';
-        goBtn.classList.add('active');
-        drawGrid();
-      } else {
-        gameMode = 'conway';
-        colors = createGrid();
-        goBtn.textContent = 'Go!';
-        goBtn.classList.remove('active');
-        drawGrid();
       }
+
+      removeGroupsWithoutLiberties();
+      setActiveGameButton(goBtn);
+      drawGrid();
     }
 
     function applyTetris() {
       if (running) return;
+      gameMode = 'tetris';
+      colors = createGrid();
+      const visited = createGrid();
+      let colorIndex = 0;
 
-      if (gameMode !== 'tetris') {
-        gameMode = 'tetris';
-        colors = createGrid();
-        const visited = createGrid();
-        let colorIndex = 0;
-
-        for (let i = 0; i < rows; i++) {
-          for (let j = 0; j < cols; j++) {
-            if (grid[i][j] === 1 && visited[i][j] === 0) {
-              const color = tetrisColors[colorIndex % tetrisColors.length];
-              floodFillColorTetris(i, j, color, visited);
-              colorIndex++;
-            }
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          if (grid[i][j] === 1 && visited[i][j] === 0) {
+            const color = tetrisColors[colorIndex % tetrisColors.length];
+            floodFillColorTetris(i, j, color, visited);
+            colorIndex++;
           }
         }
-
-        tetrisBtn.textContent = 'Return to Conway';
-        tetrisBtn.classList.add('active');
-        drawGrid();
-      } else {
-        gameMode = 'conway';
-        colors = createGrid();
-        tetrisBtn.textContent = 'Tetris';
-        tetrisBtn.classList.remove('active');
-        drawGrid();
       }
+
+      setActiveGameButton(tetrisBtn);
+      drawGrid();
     }
 
     function floodFillColorTetris(row, col, color, visited) {
@@ -491,95 +473,99 @@
 
     function applyAnt() {
       if (running) return;
+      gameMode = 'ant';
 
-      if (gameMode !== 'ant') {
-        gameMode = 'ant';
-
-        // Find a random living cell or center
-        let foundLiving = false;
-        for (let i = 0; i < rows && !foundLiving; i++) {
-          for (let j = 0; j < cols && !foundLiving; j++) {
-            if (grid[i][j] === 1 && Math.random() > 0.8) {
-              antRow = i;
-              antCol = j;
-              foundLiving = true;
-            }
+      // Find a random living cell or center
+      let foundLiving = false;
+      for (let i = 0; i < rows && !foundLiving; i++) {
+        for (let j = 0; j < cols && !foundLiving; j++) {
+          if (grid[i][j] === 1 && Math.random() > 0.8) {
+            antRow = i;
+            antCol = j;
+            foundLiving = true;
           }
         }
-        if (!foundLiving) {
-          antRow = Math.floor(rows / 2);
-          antCol = Math.floor(cols / 2);
-        }
-        antDir = 0;
-
-        antBtn.textContent = 'Return to Conway';
-        antBtn.classList.add('active');
-        drawGrid();
-      } else {
-        gameMode = 'conway';
-        antBtn.textContent = "Langton's Ant";
-        antBtn.classList.remove('active');
-        drawGrid();
       }
+      if (!foundLiving) {
+        antRow = Math.floor(rows / 2);
+        antCol = Math.floor(cols / 2);
+      }
+      antDir = 0;
+
+      setActiveGameButton(antBtn);
+      drawGrid();
     }
 
     function applySandpile() {
       if (running) return;
+      gameMode = 'sandpile';
+      sandpileValues = createGrid();
 
-      if (gameMode !== 'sandpile') {
-        gameMode = 'sandpile';
-        sandpileValues = createGrid();
-
-        for (let i = 0; i < rows; i++) {
-          for (let j = 0; j < cols; j++) {
-            if (grid[i][j] === 1) {
-              sandpileValues[i][j] = Math.floor(Math.random() * 8) + 1;
-            }
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          if (grid[i][j] === 1) {
+            sandpileValues[i][j] = Math.floor(Math.random() * 8) + 1;
           }
         }
-
-        sandpileBtn.textContent = 'Return to Conway';
-        sandpileBtn.classList.add('active');
-        drawGrid();
-      } else {
-        gameMode = 'conway';
-        sandpileValues = createGrid();
-        sandpileBtn.textContent = 'Sandpile';
-        sandpileBtn.classList.remove('active');
-        drawGrid();
       }
+
+      setActiveGameButton(sandpileBtn);
+      drawGrid();
     }
 
     function applyWireworld() {
       if (running) return;
+      gameMode = 'wireworld';
 
-      if (gameMode !== 'wireworld') {
-        gameMode = 'wireworld';
+      // Find connected groups and assign one head and one tail per group
+      const visited = createGrid();
 
-        for (let i = 0; i < rows; i++) {
-          for (let j = 0; j < cols; j++) {
-            if (grid[i][j] === 1) {
-              grid[i][j] = wireworldColors.electronHead;
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          if (grid[i][j] === 1 && visited[i][j] === 0) {
+            // Find all cells in this group
+            const groupCells = [];
+            findGroupCells(i, j, visited, groupCells);
+
+            // Convert all to conductors first
+            for (const [r, c] of groupCells) {
+              grid[r][c] = wireworldColors.conductor;
+            }
+
+            // Randomly pick one for head and one for tail
+            if (groupCells.length > 0) {
+              const headIdx = Math.floor(Math.random() * groupCells.length);
+              const [headR, headC] = groupCells[headIdx];
+              grid[headR][headC] = wireworldColors.electronHead;
+
+              if (groupCells.length > 1) {
+                let tailIdx = Math.floor(Math.random() * groupCells.length);
+                while (tailIdx === headIdx) {
+                  tailIdx = Math.floor(Math.random() * groupCells.length);
+                }
+                const [tailR, tailC] = groupCells[tailIdx];
+                grid[tailR][tailC] = wireworldColors.electronTail;
+              }
             }
           }
         }
-
-        wireworldBtn.textContent = 'Return to Conway';
-        wireworldBtn.classList.add('active');
-        drawGrid();
-      } else {
-        gameMode = 'conway';
-        for (let i = 0; i < rows; i++) {
-          for (let j = 0; j < cols; j++) {
-            if (grid[i][j] > 0) {
-              grid[i][j] = 1;
-            }
-          }
-        }
-        wireworldBtn.textContent = 'Wireworld';
-        wireworldBtn.classList.remove('active');
-        drawGrid();
       }
+
+      setActiveGameButton(wireworldBtn);
+      drawGrid();
+    }
+
+    function findGroupCells(row, col, visited, groupCells) {
+      if (row < 0 || row >= rows || col < 0 || col >= cols) return;
+      if (visited[row][col] === 1 || grid[row][col] === 0) return;
+
+      visited[row][col] = 1;
+      groupCells.push([row, col]);
+
+      findGroupCells(row - 1, col, visited, groupCells);
+      findGroupCells(row + 1, col, visited, groupCells);
+      findGroupCells(row, col - 1, visited, groupCells);
+      findGroupCells(row, col + 1, visited, groupCells);
     }
 
     function getLiberties(row, col, groupColor, visited, groupCells) {
@@ -650,7 +636,8 @@
     stopBtn.addEventListener('click', stop);
     clearBtn.addEventListener('click', clear);
     randomBtn.addEventListener('click', randomize);
-    goBtn.addEventListener('click', applyGoRules);
+    conwayBtn.addEventListener('click', applyConway);
+    goBtn.addEventListener('click', applyGo);
     tetrisBtn.addEventListener('click', applyTetris);
     antBtn.addEventListener('click', applyAnt);
     sandpileBtn.addEventListener('click', applySandpile);
