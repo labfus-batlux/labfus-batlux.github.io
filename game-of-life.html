@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Conway's Game of Life - Charlie Sands</title>
+  <style>
+    html, body { background: #fff; color: #111; margin: 0; padding: 0; }
+    body { font: 16px/1.6 ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; }
+    .wrap { max-width: 800px; margin: 24px auto; padding: 0 16px; }
+    h1 { font-size: 24px; margin: 0 0 16px; }
+    .controls { margin: 16px 0; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    button {
+      padding: 8px 16px;
+      background: #2b59ff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover { background: #1e42cc; }
+    button:disabled { background: #ccc; cursor: not-allowed; }
+    #canvas {
+      border: 1px solid #ddd;
+      cursor: crosshair;
+      display: block;
+      margin: 16px 0;
+    }
+    .info { font-size: 14px; color: #555; margin: 8px 0; }
+    .back { margin-top: 24px; font-size: 14px; }
+    a { color: #2b59ff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>Conway's Game of Life</h1>
+    <p class="info">Click cells to toggle them. Press Start to begin simulation.</p>
+
+    <div class="controls">
+      <button id="startBtn">Start</button>
+      <button id="stopBtn" disabled>Stop</button>
+      <button id="clearBtn">Clear</button>
+      <button id="randomBtn">Random</button>
+      <span class="info">Generation: <span id="generation">0</span></span>
+    </div>
+
+    <canvas id="canvas" width="600" height="400"></canvas>
+
+    <p class="back"><a href="index.html">← Back to home</a></p>
+  </main>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const randomBtn = document.getElementById('randomBtn');
+    const generationDisplay = document.getElementById('generation');
+
+    const cellSize = 10;
+    const cols = canvas.width / cellSize;
+    const rows = canvas.height / cellSize;
+
+    let grid = createGrid();
+    let running = false;
+    let generation = 0;
+    let intervalId = null;
+
+    function createGrid() {
+      return Array(rows).fill(null).map(() => Array(cols).fill(0));
+    }
+
+    function drawGrid() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          ctx.strokeStyle = '#e0e0e0';
+          ctx.strokeRect(j * cellSize, i * cellSize, cellSize, cellSize);
+
+          if (grid[i][j] === 1) {
+            ctx.fillStyle = '#2b59ff';
+            ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+          }
+        }
+      }
+    }
+
+    function countNeighbors(row, col) {
+      let count = 0;
+      for (let i = -1; i <= 1; i++) {
+        for (let j = -1; j <= 1; j++) {
+          if (i === 0 && j === 0) continue;
+          const newRow = (row + i + rows) % rows;
+          const newCol = (col + j + cols) % cols;
+          count += grid[newRow][newCol];
+        }
+      }
+      return count;
+    }
+
+    function nextGeneration() {
+      const newGrid = createGrid();
+
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          const neighbors = countNeighbors(i, j);
+          const cell = grid[i][j];
+
+          if (cell === 1 && (neighbors === 2 || neighbors === 3)) {
+            newGrid[i][j] = 1;
+          } else if (cell === 0 && neighbors === 3) {
+            newGrid[i][j] = 1;
+          }
+        }
+      }
+
+      grid = newGrid;
+      generation++;
+      generationDisplay.textContent = generation;
+      drawGrid();
+    }
+
+    function start() {
+      if (!running) {
+        running = true;
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+        intervalId = setInterval(nextGeneration, 100);
+      }
+    }
+
+    function stop() {
+      running = false;
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      clearInterval(intervalId);
+    }
+
+    function clear() {
+      stop();
+      grid = createGrid();
+      generation = 0;
+      generationDisplay.textContent = generation;
+      drawGrid();
+    }
+
+    function randomize() {
+      stop();
+      grid = createGrid();
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          grid[i][j] = Math.random() > 0.7 ? 1 : 0;
+        }
+      }
+      generation = 0;
+      generationDisplay.textContent = generation;
+      drawGrid();
+    }
+
+    canvas.addEventListener('click', (e) => {
+      if (running) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const col = Math.floor(x / cellSize);
+      const row = Math.floor(y / cellSize);
+
+      if (row >= 0 && row < rows && col >= 0 && col < cols) {
+        grid[row][col] = grid[row][col] === 1 ? 0 : 1;
+        drawGrid();
+      }
+    });
+
+    startBtn.addEventListener('click', start);
+    stopBtn.addEventListener('click', stop);
+    clearBtn.addEventListener('click', clear);
+    randomBtn.addEventListener('click', randomize);
+
+    // Initial draw
+    drawGrid();
+  </script>
+</body>
+</html>
