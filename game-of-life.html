@@ -249,10 +249,11 @@
         }
       }
 
-      // For each shape, check if it can move down as a unit
-      const newGrid = createGrid();
-      const newColors = createGrid();
+      // Create a set of all cells that will be occupied (to check collisions)
+      const willBeOccupied = new Set();
+      const shapeMovements = {}; // Track which shapes can move
 
+      // First pass: determine which shapes can move
       for (const color in colorToShape) {
         const shapeCells = colorToShape[color];
         let canMoveDown = true;
@@ -260,42 +261,43 @@
         // Check if entire shape can move down
         for (const [r, c] of shapeCells) {
           if (r === rows - 1) {
+            // Hit bottom
             canMoveDown = false;
             break;
           }
-          // Check if the cell below is occupied by a different shape
+
           const cellBelow = [r + 1, c];
           const isCellBelowInSameShape = shapeCells.some(([sr, sc]) => sr === cellBelow[0] && sc === cellBelow[1]);
 
           if (!isCellBelowInSameShape) {
-            // Check if cell below will be occupied by another shape
-            let willBeOccupied = false;
-            for (const otherColor in colorToShape) {
-              if (otherColor !== color) {
-                const otherShape = colorToShape[otherColor];
-                // Check if other shape is at or will be at this position
-                for (const [or, oc] of otherShape) {
-                  if (or === r + 1 && oc === c) {
-                    willBeOccupied = true;
-                    break;
-                  }
-                }
-              }
-            }
-            if (willBeOccupied || (grid[r + 1][c] === 1 && colors[r + 1][c] !== color)) {
+            // Check if there's already a cell from the current grid below (not part of this shape)
+            const cellBelowColor = colors[r + 1][c];
+            if (grid[r + 1][c] === 1 && cellBelowColor !== color) {
               canMoveDown = false;
               break;
             }
           }
         }
 
-        // Move shape down or keep in place
-        if (canMoveDown) {
+        shapeMovements[color] = canMoveDown;
+      }
+
+      // Second pass: build new grid based on movements
+      const newGrid = createGrid();
+      const newColors = createGrid();
+
+      for (const color in colorToShape) {
+        const shapeCells = colorToShape[color];
+        const canMove = shapeMovements[color];
+
+        if (canMove) {
+          // Move shape down
           for (const [r, c] of shapeCells) {
             newGrid[r + 1][c] = 1;
             newColors[r + 1][c] = color;
           }
         } else {
+          // Keep shape in place
           for (const [r, c] of shapeCells) {
             newGrid[r][c] = 1;
             newColors[r][c] = color;
@@ -304,7 +306,6 @@
       }
 
       // Check for complete rows and remove them
-      const rowsToRemove = [];
       for (let i = 0; i < rows; i++) {
         let complete = true;
         for (let j = 0; j < cols; j++) {
@@ -314,15 +315,11 @@
           }
         }
         if (complete) {
-          rowsToRemove.push(i);
-        }
-      }
-
-      // Remove complete rows
-      for (const rowIdx of rowsToRemove) {
-        for (let j = 0; j < cols; j++) {
-          newGrid[rowIdx][j] = 0;
-          newColors[rowIdx][j] = 0;
+          // Clear the row
+          for (let j = 0; j < cols; j++) {
+            newGrid[i][j] = 0;
+            newColors[i][j] = 0;
+          }
         }
       }
 
