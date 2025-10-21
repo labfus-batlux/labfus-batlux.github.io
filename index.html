@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Charlie Sands</title>
+  <meta name="description" content="Charlie Sands" />
+  <style>
+    html, body { background: #fff; color: #111; }
+    body { font: 16px/1.6 ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; margin: 0; }
+    .wrap { max-width: 680px; margin: 48px auto; padding: 0 16px; }
+    h1 { font-size: 28px; margin: 0 0 16px; }
+    em { font-size: 14px; color: #333; }
+    .list { list-style: none; padding: 0; margin: 16px 0 28px; }
+    .list li { margin: 8px 0; }
+    a { color: #2b59ff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    footer { margin-top: 48px; font-size: 14px; color: #444; }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>Charlie Sands</h1>
+    <p><em>Founder:</em></p>
+    <ul class="list">
+      <li>Your thing one</li>
+      <li>Your thing two</li>
+      <li>Your thing three</li>
+      <li>Your thing four <a href="#">(site)</a></li>
+    </ul>
+
+    <p><a href="mailto:charlie@fuseenergy.com">Contact</a></p>
+
+    <footer>
+      <p>© <span id="year"></span></p>
+    </footer>
+  </main>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
+
