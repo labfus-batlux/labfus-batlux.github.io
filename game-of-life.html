@@ -679,12 +679,23 @@
         }
       }
 
+      // If switching FROM wireworld, convert all non-empty cells to living cells
+      if (gameMode === 'wireworld') {
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            if (grid[i][j] > 0) {
+              grid[i][j] = 1;
+            }
+          }
+        }
+      }
+
       gameMode = 'sandpile';
       sandpileValues = createGrid();
 
       for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
-          if (grid[i][j] === 1) {
+          if (grid[i][j] === 1 || grid[i][j] > 0) {
             sandpileValues[i][j] = Math.floor(Math.random() * 8) + 1;
           }
         }
