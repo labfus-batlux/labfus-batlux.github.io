@@ -74,11 +74,8 @@
     let intervalId = null;
     let goMode = false;
 
-    // Color palette for Go stones
-    const goColors = [
-      '#2b59ff', '#ff5722', '#4caf50', '#ff9800',
-      '#9c27b0', '#00bcd4', '#ffeb3b', '#e91e63'
-    ];
+    // Two colors for Go stones (black and white)
+    const goColors = ['#111', '#fff'];
 
     function createGrid() {
       return Array(rows).fill(null).map(() => Array(cols).fill(0));
@@ -95,10 +92,21 @@
           if (grid[i][j] === 1) {
             if (goMode && colors[i][j]) {
               ctx.fillStyle = colors[i][j];
+              if (colors[i][j] === '#fff') {
+                // Add border for white stones so they're visible
+                ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(j * cellSize, i * cellSize, cellSize, cellSize);
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = '#e0e0e0';
+              } else {
+                ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+              }
             } else {
               ctx.fillStyle = '#2b59ff';
+              ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
             }
-            ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
           }
         }
       }
@@ -190,18 +198,14 @@
       if (running) return;
 
       if (!goMode) {
-        // Entering Go mode: assign colors to groups
+        // Entering Go mode: assign random colors to each stone
         goMode = true;
         colors = createGrid();
-        const visited = createGrid();
-        let colorIndex = 0;
 
         for (let i = 0; i < rows; i++) {
           for (let j = 0; j < cols; j++) {
-            if (grid[i][j] === 1 && visited[i][j] === 0) {
-              const color = goColors[colorIndex % goColors.length];
-              floodFillColor(i, j, color, visited);
-              colorIndex++;
+            if (grid[i][j] === 1) {
+              colors[i][j] = goColors[Math.floor(Math.random() * 2)];
             }
           }
         }
@@ -222,26 +226,7 @@
       }
     }
 
-    function floodFillColor(row, col, color, visited) {
-      const stack = [[row, col]];
-
-      while (stack.length > 0) {
-        const [r, c] = stack.pop();
-
-        if (r < 0 || r >= rows || c < 0 || c >= cols) continue;
-        if (visited[r][c] === 1 || grid[r][c] === 0) continue;
-
-        visited[r][c] = 1;
-        colors[r][c] = color;
-
-        stack.push([r - 1, c]);
-        stack.push([r + 1, c]);
-        stack.push([r, c - 1]);
-        stack.push([r, c + 1]);
-      }
-    }
-
-    function getLiberties(row, col, visited, groupCells) {
+    function getLiberties(row, col, groupColor, visited, groupCells) {
       if (row < 0 || row >= rows || col < 0 || col >= cols) return 0;
       if (visited[row][col] === 1) return 0;
 
@@ -251,13 +236,18 @@
         return 1; // Empty space is a liberty
       }
 
+      // Only continue if same color
+      if (colors[row][col] !== groupColor) {
+        return 0;
+      }
+
       groupCells.push([row, col]);
 
       let liberties = 0;
-      liberties += getLiberties(row - 1, col, visited, groupCells);
-      liberties += getLiberties(row + 1, col, visited, groupCells);
-      liberties += getLiberties(row, col - 1, visited, groupCells);
-      liberties += getLiberties(row, col + 1, visited, groupCells);
+      liberties += getLiberties(row - 1, col, groupColor, visited, groupCells);
+      liberties += getLiberties(row + 1, col, groupColor, visited, groupCells);
+      liberties += getLiberties(row, col - 1, groupColor, visited, groupCells);
+      liberties += getLiberties(row, col + 1, groupColor, visited, groupCells);
 
       return liberties;
     }
@@ -269,7 +259,8 @@
         for (let j = 0; j < cols; j++) {
           if (grid[i][j] === 1 && visited[i][j] === 0) {
             const groupCells = [];
-            const liberties = getLiberties(i, j, visited, groupCells);
+            const groupColor = colors[i][j];
+            const liberties = getLiberties(i, j, groupColor, visited, groupCells);
 
             if (liberties === 0) {
               // Remove this group
