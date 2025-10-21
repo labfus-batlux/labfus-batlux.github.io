@@ -89,10 +89,11 @@
     let intervalId = null;
     let gameMode = 'conway'; // 'conway', 'go', 'tetris', 'ant', 'sandpile', 'wireworld'
 
-    // Ant state
-    let antRow = 0;
-    let antCol = 0;
-    let antDir = 0; // 0=up, 1=right, 2=down, 3=left
+    // Ant state - array of 5 ants
+    let ants = [];
+    for (let i = 0; i < 5; i++) {
+      ants.push({ row: 0, col: 0, dir: 0 }); // dir: 0=up, 1=right, 2=down, 3=left
+    }
 
     // Two colors for Go stones (black and white)
     const goColors = ['#111', '#fff'];
@@ -171,12 +172,15 @@
         }
       }
 
-      // Draw ant
+      // Draw ants
       if (gameMode === 'ant') {
-        ctx.fillStyle = '#ff0000';
-        ctx.beginPath();
-        ctx.arc(antCol * cellSize + cellSize / 2, antRow * cellSize + cellSize / 2, cellSize / 3, 0, Math.PI * 2);
-        ctx.fill();
+        const antColors = ['#ff0000', '#00ff00', '#0000ff', '#ff00ff', '#ffff00'];
+        ants.forEach((ant, idx) => {
+          ctx.fillStyle = antColors[idx % antColors.length];
+          ctx.beginPath();
+          ctx.arc(ant.col * cellSize + cellSize / 2, ant.row * cellSize + cellSize / 2, cellSize / 3, 0, Math.PI * 2);
+          ctx.fill();
+        });
       }
     }
 
@@ -270,22 +274,25 @@
     }
 
     function nextAnt() {
-      // Langton's ant: turn right on white, left on black
-      if (grid[antRow][antCol] === 0) {
-        // White cell: turn right, flip to black
-        antDir = (antDir + 1) % 4;
-        grid[antRow][antCol] = 1;
-      } else {
-        // Black cell: turn left, flip to white
-        antDir = (antDir + 3) % 4;
-        grid[antRow][antCol] = 0;
-      }
+      // Move each ant according to Langton's ant rules
+      ants.forEach(ant => {
+        // Langton's ant: turn right on white, left on black
+        if (grid[ant.row][ant.col] === 0) {
+          // White cell: turn right, flip to black
+          ant.dir = (ant.dir + 1) % 4;
+          grid[ant.row][ant.col] = 1;
+        } else {
+          // Black cell: turn left, flip to white
+          ant.dir = (ant.dir + 3) % 4;
+          grid[ant.row][ant.col] = 0;
+        }
 
-      // Move forward
-      if (antDir === 0) antRow = (antRow - 1 + rows) % rows;
-      else if (antDir === 1) antCol = (antCol + 1) % cols;
-      else if (antDir === 2) antRow = (antRow + 1) % rows;
-      else if (antDir === 3) antCol = (antCol - 1 + cols) % cols;
+        // Move forward
+        if (ant.dir === 0) ant.row = (ant.row - 1 + rows) % rows;
+        else if (ant.dir === 1) ant.col = (ant.col + 1) % cols;
+        else if (ant.dir === 2) ant.row = (ant.row + 1) % rows;
+        else if (ant.dir === 3) ant.col = (ant.col - 1 + cols) % cols;
+      });
     }
 
     function nextSandpile() {
@@ -398,23 +405,53 @@
     function setActiveGameButton(activeBtn) {
       gameButtons.forEach(btn => {
         btn.classList.remove('active');
-        btn.disabled = (btn !== activeBtn);
+        // Only disable other buttons if running
+        if (running) {
+          btn.disabled = (btn !== activeBtn);
+        } else {
+          btn.disabled = false;
+        }
       });
       activeBtn.classList.add('active');
-      activeBtn.disabled = false;
     }
 
     function applyConway() {
       if (running) return;
+
+      // If switching FROM sandpile mode, convert any cells with values to living cells
+      if (gameMode === 'sandpile') {
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            if (sandpileValues[i][j] > 0) {
+              grid[i][j] = 1;
+            }
+          }
+        }
+      }
+
       gameMode = 'conway';
       colors = createGrid();
       sandpileValues = createGrid();
       setActiveGameButton(conwayBtn);
+      startBtn.disabled = false; // Re-enable start for iterative modes
       drawGrid();
     }
 
     function applyGo() {
       if (running) return;
+
+      // If switching FROM sandpile mode, convert any cells with values to living cells
+      if (gameMode === 'sandpile') {
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            if (sandpileValues[i][j] > 0) {
+              grid[i][j] = 1;
+            }
+          }
+        }
+      }
+
+      // Go mode does not iterate, so disable start button
       gameMode = 'go';
       colors = createGrid();
 
@@ -428,11 +465,24 @@
 
       removeGroupsWithoutLiberties();
       setActiveGameButton(goBtn);
+      startBtn.disabled = true; // Go doesn't iterate
       drawGrid();
     }
 
     function applyTetris() {
       if (running) return;
+
+      // If switching FROM sandpile mode, convert any cells with values to living cells
+      if (gameMode === 'sandpile') {
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            if (sandpileValues[i][j] > 0) {
+              grid[i][j] = 1;
+            }
+          }
+        }
+      }
+
       gameMode = 'tetris';
       colors = createGrid();
       const visited = createGrid();
@@ -449,6 +499,7 @@
       }
 
       setActiveGameButton(tetrisBtn);
+      startBtn.disabled = false; // Re-enable start for iterative modes
       drawGrid();
     }
 
@@ -473,31 +524,67 @@
 
     function applyAnt() {
       if (running) return;
-      gameMode = 'ant';
 
-      // Find a random living cell or center
-      let foundLiving = false;
-      for (let i = 0; i < rows && !foundLiving; i++) {
-        for (let j = 0; j < cols && !foundLiving; j++) {
-          if (grid[i][j] === 1 && Math.random() > 0.8) {
-            antRow = i;
-            antCol = j;
-            foundLiving = true;
+      // If switching FROM sandpile mode, convert any cells with values to living cells
+      if (gameMode === 'sandpile') {
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            if (sandpileValues[i][j] > 0) {
+              grid[i][j] = 1;
+            }
           }
         }
       }
-      if (!foundLiving) {
-        antRow = Math.floor(rows / 2);
-        antCol = Math.floor(cols / 2);
+
+      gameMode = 'ant';
+
+      // Initialize 5 ants at different positions
+      const livingCells = [];
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          if (grid[i][j] === 1) {
+            livingCells.push([i, j]);
+          }
+        }
       }
-      antDir = 0;
+
+      // Place ants either on living cells or spread them out
+      if (livingCells.length >= 5) {
+        // Randomly select 5 living cells
+        const shuffled = livingCells.sort(() => Math.random() - 0.5);
+        for (let i = 0; i < 5; i++) {
+          ants[i].row = shuffled[i][0];
+          ants[i].col = shuffled[i][1];
+          ants[i].dir = Math.floor(Math.random() * 4);
+        }
+      } else {
+        // Spread ants across the grid
+        for (let i = 0; i < 5; i++) {
+          ants[i].row = Math.floor(rows / 6 * (i + 1));
+          ants[i].col = Math.floor(cols / 2);
+          ants[i].dir = i % 4;
+        }
+      }
 
       setActiveGameButton(antBtn);
+      startBtn.disabled = false; // Re-enable start for iterative modes
       drawGrid();
     }
 
     function applySandpile() {
       if (running) return;
+
+      // If switching FROM sandpile mode, convert any cells with values to living cells
+      if (gameMode === 'sandpile') {
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            if (sandpileValues[i][j] > 0) {
+              grid[i][j] = 1;
+            }
+          }
+        }
+      }
+
       gameMode = 'sandpile';
       sandpileValues = createGrid();
 
@@ -510,11 +597,24 @@
       }
 
       setActiveGameButton(sandpileBtn);
+      startBtn.disabled = false; // Re-enable start for iterative modes
       drawGrid();
     }
 
     function applyWireworld() {
       if (running) return;
+
+      // If switching FROM sandpile mode, convert any cells with values to living cells
+      if (gameMode === 'sandpile') {
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            if (sandpileValues[i][j] > 0) {
+              grid[i][j] = 1;
+            }
+          }
+        }
+      }
+
       gameMode = 'wireworld';
 
       // Find connected groups and assign one head and one tail per group
@@ -552,6 +652,7 @@
       }
 
       setActiveGameButton(wireworldBtn);
+      startBtn.disabled = false; // Re-enable start for iterative modes
       drawGrid();
     }
 
