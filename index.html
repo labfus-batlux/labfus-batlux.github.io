@@ -85,14 +85,14 @@
 <body>
   <main class="wrap">
     <div class="toggle-container">
-      <span class="toggle-label">.md</span>
+      <span class="toggle-label">render</span>
       <label class="switch">
         <input type="checkbox" id="toggleSwitch">
         <span class="slider"></span>
       </label>
     </div>
-    <div id="content"></div>
-    <div id="raw-markdown" class="hidden"></div>
+    <div id="content" class="hidden"></div>
+    <div id="raw-markdown"></div>
 
     <p><a href="game-of-life.html">Grid!</a> · <a href="contact.html">Contact</a></p>
 
@@ -123,7 +123,7 @@
       const content = document.getElementById('content');
       const raw = document.getElementById('raw-markdown');
 
-      showingRaw = this.checked;
+      showingRaw = !this.checked; // Inverted: unchecked = raw, checked = rendered
 
       if (showingRaw) {
         content.classList.add('hidden');
