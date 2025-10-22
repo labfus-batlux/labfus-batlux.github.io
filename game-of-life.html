@@ -254,6 +254,7 @@
       // Build new grid by checking each shape independently
       const newGrid = createGrid();
       const newColors = createGrid();
+      let anyShapeMoved = false;
 
       // Sort shapes by their lowest row (process from bottom to top)
       shapes.sort((a, b) => {
@@ -289,6 +290,7 @@
 
         // Place shape in new grid
         if (canMoveDown) {
+          anyShapeMoved = true;
           // Move shape down
           for (const [r, c] of shapeCells) {
             newGrid[r + 1][c] = 1;
@@ -323,6 +325,11 @@
 
       grid = newGrid;
       colors = newColors;
+
+      // Stop if no shapes moved and no rows were cleared
+      if (!anyShapeMoved && generation > 0) {
+        stop();
+      }
     }
 
     function floodFillTetrisShape(row, col, color, visited, shapeCells) {
