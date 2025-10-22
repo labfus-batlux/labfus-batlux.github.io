@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Grid! - Charlie Sands</title>
+  <title>Grid - Charlie Sands</title>
   <style>
     html, body { background: #fff; color: #111; margin: 0; padding: 0; }
     body { font: 16px/1.6 ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; }
@@ -36,8 +36,8 @@
 </head>
 <body>
   <main class="wrap">
-    <h1>Grid!</h1>
-    <p class="info">Click cells to toggle them. Press Start to begin simulation.</p>
+    <h1>Grid</h1>
+    <p class="info" id="instructions">Click cells to toggle them. Press Start to begin simulation.</p>
 
     <div class="controls">
       <button id="startBtn">Start</button>
@@ -76,6 +76,7 @@
     const wireworldBtn = document.getElementById('wireworldBtn');
     const generationDisplay = document.getElementById('generation');
     const speedSlider = document.getElementById('speedSlider');
+    const instructionsDisplay = document.getElementById('instructions');
 
     const gameButtons = [conwayBtn, goBtn, tetrisBtn, antBtn, sandpileBtn, wireworldBtn];
 
@@ -116,6 +117,18 @@
 
     function createGrid() {
       return Array(rows).fill(null).map(() => Array(cols).fill(0));
+    }
+
+    function updateInstructions() {
+      const instructions = {
+        'conway': 'Conway\'s Game of Life: Click cells to toggle them. Living cells with 2-3 neighbors survive, dead cells with 3 neighbors become alive. Press Start to evolve.',
+        'go': 'Go: Click to place black or white stones. Groups without liberties (adjacent empty spaces) are removed. Press Start is disabled for this mode.',
+        'tetris': 'Tetris: Click to place colored blocks. Connected shapes fall down and complete rows are cleared. Press Start to drop pieces.',
+        'ant': 'Langton\'s Ant: Click cells to set initial pattern. Five ants follow rules: turn right on white cells, left on black cells, then flip the cell color and move forward. Press Start to watch.',
+        'sandpile': 'Sandpile: Click cells to add grains of sand (values 1-8). Cells with 4+ grains topple, distributing one grain to each neighbor. Press Start to cascade.',
+        'wireworld': 'Wireworld: Click to toggle conductors (yellow). Electron heads (blue) become tails (red), tails become conductors. Conductors become heads if 1-2 neighboring heads exist. Press Start to simulate.'
+      };
+      instructionsDisplay.textContent = instructions[gameMode] || instructions['conway'];
     }
 
     function drawGrid() {
@@ -533,6 +546,7 @@
       sandpileValues = createGrid();
       setActiveGameButton(conwayBtn);
       startBtn.disabled = false; // Re-enable start for iterative modes
+      updateInstructions();
       drawGrid();
     }
 
@@ -576,6 +590,7 @@
       removeGroupsWithoutLiberties();
       setActiveGameButton(goBtn);
       startBtn.disabled = true; // Go doesn't iterate
+      updateInstructions();
       drawGrid();
     }
 
@@ -622,6 +637,7 @@
 
       setActiveGameButton(tetrisBtn);
       startBtn.disabled = false; // Re-enable start for iterative modes
+      updateInstructions();
       drawGrid();
     }
 
@@ -701,6 +717,7 @@
 
       setActiveGameButton(antBtn);
       startBtn.disabled = false; // Re-enable start for iterative modes
+      updateInstructions();
       drawGrid();
     }
 
@@ -742,6 +759,7 @@
 
       setActiveGameButton(sandpileBtn);
       startBtn.disabled = false; // Re-enable start for iterative modes
+      updateInstructions();
       drawGrid();
     }
 
@@ -797,6 +815,7 @@
 
       setActiveGameButton(wireworldBtn);
       startBtn.disabled = false; // Re-enable start for iterative modes
+      updateInstructions();
       drawGrid();
     }
 
@@ -925,6 +944,7 @@
     speedSlider.addEventListener('input', updateSpeed);
 
     // Initial draw
+    updateInstructions();
     drawGrid();
   </script>
 </body>
