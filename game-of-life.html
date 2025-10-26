@@ -91,6 +91,8 @@
     let generation = 0;
     let intervalId = null;
     let gameMode = 'conway'; // 'conway', 'go', 'tetris', 'ant', 'sandpile', 'wireworld'
+    let isMouseDown = false;
+    let lastCell = { row: -1, col: -1 };
 
     // Ant state - array of 5 ants
     let ants = [];
@@ -880,8 +882,60 @@
       }
     }
 
-    canvas.addEventListener('click', (e) => {
+    function toggleCell(row, col) {
+      if (gameMode === 'conway') {
+        grid[row][col] = grid[row][col] === 1 ? 0 : 1;
+      } else if (gameMode === 'go') {
+        if (grid[row][col] === 1) {
+          grid[row][col] = 0;
+          colors[row][col] = 0;
+        } else {
+          grid[row][col] = 1;
+          colors[row][col] = goColors[Math.floor(Math.random() * 2)];
+        }
+      } else if (gameMode === 'tetris') {
+        if (grid[row][col] === 1) {
+          grid[row][col] = 0;
+          colors[row][col] = 0;
+        } else {
+          grid[row][col] = 1;
+          // Check adjacent cells for existing colors
+          let adjacentColor = null;
+          const neighbors = [
+            [row - 1, col], [row + 1, col],
+            [row, col - 1], [row, col + 1]
+          ];
+          for (const [r, c] of neighbors) {
+            if (r >= 0 && r < rows && c >= 0 && c < cols && grid[r][c] === 1 && colors[r][c]) {
+              adjacentColor = colors[r][c];
+              break;
+            }
+          }
+          // Assign adjacent color if found, otherwise random
+          colors[row][col] = adjacentColor || tetrisColors[Math.floor(Math.random() * tetrisColors.length)];
+        }
+      } else if (gameMode === 'ant') {
+        grid[row][col] = grid[row][col] === 1 ? 0 : 1;
+      } else if (gameMode === 'sandpile') {
+        if (sandpileValues[row][col] > 0) {
+          sandpileValues[row][col] = 0;
+          grid[row][col] = 0;
+        } else {
+          sandpileValues[row][col] = Math.floor(Math.random() * 8) + 1;
+          grid[row][col] = 1;
+        }
+      } else if (gameMode === 'wireworld') {
+        if (grid[row][col] === 0) {
+          grid[row][col] = wireworldColors.conductor;
+        } else {
+          grid[row][col] = 0;
+        }
+      }
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
       if (running) return;
+      isMouseDown = true;
 
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
@@ -891,56 +945,40 @@
       const row = Math.floor(y / cellSize);
 
       if (row >= 0 && row < rows && col >= 0 && col < cols) {
-        if (gameMode === 'conway') {
-          grid[row][col] = grid[row][col] === 1 ? 0 : 1;
-        } else if (gameMode === 'go') {
-          if (grid[row][col] === 1) {
-            grid[row][col] = 0;
-            colors[row][col] = 0;
-          } else {
-            grid[row][col] = 1;
-            colors[row][col] = goColors[Math.floor(Math.random() * 2)];
-          }
-        } else if (gameMode === 'tetris') {
-          if (grid[row][col] === 1) {
-            grid[row][col] = 0;
-            colors[row][col] = 0;
-          } else {
-            grid[row][col] = 1;
-            // Check adjacent cells for existing colors
-            let adjacentColor = null;
-            const neighbors = [
-              [row - 1, col], [row + 1, col],
-              [row, col - 1], [row, col + 1]
-            ];
-            for (const [r, c] of neighbors) {
-              if (r >= 0 && r < rows && c >= 0 && c < cols && grid[r][c] === 1 && colors[r][c]) {
-                adjacentColor = colors[r][c];
-                break;
-              }
-            }
-            // Assign adjacent color if found, otherwise random
-            colors[row][col] = adjacentColor || tetrisColors[Math.floor(Math.random() * tetrisColors.length)];
-          }
-        } else if (gameMode === 'ant') {
-          grid[row][col] = grid[row][col] === 1 ? 0 : 1;
-        } else if (gameMode === 'sandpile') {
-          if (sandpileValues[row][col] > 0) {
-            sandpileValues[row][col] = 0;
-            grid[row][col] = 0;
-          } else {
-            sandpileValues[row][col] = Math.floor(Math.random() * 8) + 1;
-            grid[row][col] = 1;
-          }
-        } else if (gameMode === 'wireworld') {
-          if (grid[row][col] === 0) {
-            grid[row][col] = wireworldColors.conductor;
-          } else {
-            grid[row][col] = 0;
-          }
-        }
+        toggleCell(row, col);
+        lastCell = { row, col };
         drawGrid();
       }
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      if (!isMouseDown || running) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const col = Math.floor(x / cellSize);
+      const row = Math.floor(y / cellSize);
+
+      if (row >= 0 && row < rows && col >= 0 && col < cols) {
+        // Only toggle if we've moved to a new cell
+        if (row !== lastCell.row || col !== lastCell.col) {
+          toggleCell(row, col);
+          lastCell = { row, col };
+          drawGrid();
+        }
+      }
+    });
+
+    canvas.addEventListener('mouseup', () => {
+      isMouseDown = false;
+      lastCell = { row: -1, col: -1 };
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+      isMouseDown = false;
+      lastCell = { row: -1, col: -1 };
     });
 
     startBtn.addEventListener('click', start);
