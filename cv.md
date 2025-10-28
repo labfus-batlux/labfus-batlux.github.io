@@ -2,7 +2,7 @@
 
 ### Experience
 
-Fuse Energy
+Fuse Energy · *Senior Operations Manager* · 2023-2025 
 
 - End to end ownership of gas business
     - Worked across engineering, design, trading, compliance, finance, and operations.
@@ -15,9 +15,9 @@ Fuse Energy
 
 ### Education and Qualifications
 
-- NYU · Politics & Aesthetics · 2020-2023
-- Pratt Institute · Fine Art · 2018-2019
-- Licensed Emergency Medical Technician · State of NY
+- NYU · *Politics & Aesthetics* · 2020-2023
+- Pratt Institute · *Fine Art* · 2018-2019
+- Licensed Emergency Medical Technician · *State of NY*
 
 ### Interests
 
