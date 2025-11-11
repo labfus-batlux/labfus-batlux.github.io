@@ -320,11 +320,17 @@
         }
       }
 
+      grid = newGrid;
+      colors = newColors;
+
+      // Merge touching shapes into the same color
+      mergeTouchingShapes();
+
       // Check for complete rows and remove them
       for (let i = 0; i < rows; i++) {
         let complete = true;
         for (let j = 0; j < cols; j++) {
-          if (newGrid[i][j] === 0) {
+          if (grid[i][j] === 0) {
             complete = false;
             break;
           }
@@ -332,14 +338,11 @@
         if (complete) {
           // Clear the row
           for (let j = 0; j < cols; j++) {
-            newGrid[i][j] = 0;
-            newColors[i][j] = 0;
+            grid[i][j] = 0;
+            colors[i][j] = 0;
           }
         }
       }
-
-      grid = newGrid;
-      colors = newColors;
 
       // Stop if no shapes moved and no rows were cleared
       if (!anyShapeMoved && generation > 0) {
@@ -359,6 +362,49 @@
       floodFillTetrisShape(row + 1, col, color, visited, shapeCells);
       floodFillTetrisShape(row, col - 1, color, visited, shapeCells);
       floodFillTetrisShape(row, col + 1, color, visited, shapeCells);
+    }
+
+    function floodFillIgnoreColor(row, col, visited, shapeCells) {
+      if (row < 0 || row >= rows || col < 0 || col >= cols) return;
+      if (visited[row][col] === 1 || grid[row][col] === 0) return;
+
+      visited[row][col] = 1;
+      shapeCells.push([row, col]);
+
+      floodFillIgnoreColor(row - 1, col, visited, shapeCells);
+      floodFillIgnoreColor(row + 1, col, visited, shapeCells);
+      floodFillIgnoreColor(row, col - 1, visited, shapeCells);
+      floodFillIgnoreColor(row, col + 1, visited, shapeCells);
+    }
+
+    function mergeTouchingShapes() {
+      // After shapes have fallen, merge any shapes that are touching
+      const visited = createGrid();
+
+      // Identify all shapes (groups of connected cells, ignoring color)
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          if (grid[i][j] === 1 && visited[i][j] === 0) {
+            const shapeCells = [];
+            // Flood fill ignoring color differences
+            floodFillIgnoreColor(i, j, visited, shapeCells);
+
+            // Find all unique colors in this shape
+            const colorsInShape = new Set();
+            for (const [r, c] of shapeCells) {
+              colorsInShape.add(colors[r][c]);
+            }
+
+            // If multiple colors exist, unify them to the first color
+            if (colorsInShape.size > 1) {
+              const unifiedColor = colors[shapeCells[0][0]][shapeCells[0][1]];
+              for (const [r, c] of shapeCells) {
+                colors[r][c] = unifiedColor;
+              }
+            }
+          }
+        }
+      }
     }
 
     function nextAnt() {
