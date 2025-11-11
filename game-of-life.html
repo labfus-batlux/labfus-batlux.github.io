@@ -323,11 +323,9 @@
       grid = newGrid;
       colors = newColors;
 
-      // Merge touching shapes into the same color
-      mergeTouchingShapes();
-
       // Check for complete rows and remove them
-      for (let i = 0; i < rows; i++) {
+      let rowsCleared = false;
+      for (let i = rows - 1; i >= 0; i--) {
         let complete = true;
         for (let j = 0; j < cols; j++) {
           if (grid[i][j] === 0) {
@@ -336,11 +334,21 @@
           }
         }
         if (complete) {
-          // Clear the row
-          for (let j = 0; j < cols; j++) {
-            grid[i][j] = 0;
-            colors[i][j] = 0;
+          rowsCleared = true;
+          // Shift all rows above down
+          for (let k = i; k > 0; k--) {
+            for (let j = 0; j < cols; j++) {
+              grid[k][j] = grid[k - 1][j];
+              colors[k][j] = colors[k - 1][j];
+            }
           }
+          // Clear the top row
+          for (let j = 0; j < cols; j++) {
+            grid[0][j] = 0;
+            colors[0][j] = 0;
+          }
+          // Check the same row again since we shifted down
+          i++;
         }
       }
 
@@ -959,6 +967,9 @@
           }
           // Assign adjacent color if found, otherwise random
           colors[row][col] = adjacentColor || tetrisColors[Math.floor(Math.random() * tetrisColors.length)];
+
+          // Merge touching shapes when user manually connects them
+          mergeTouchingShapes();
         }
       } else if (gameMode === 'ant') {
         grid[row][col] = grid[row][col] === 1 ? 0 : 1;
