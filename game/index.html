@@ -40,6 +40,34 @@
     .back { margin-top: 24px; font-size: 14px; }
     a { color: #2b59ff; text-decoration: none; }
     a:hover { text-decoration: underline; }
+    #speedSlider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100px;
+      height: 6px;
+      background: #ddd;
+      outline: none;
+      border-radius: 3px;
+      vertical-align: middle;
+      cursor: pointer;
+    }
+    #speedSlider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      background: #2b59ff;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+    #speedSlider::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      background: #2b59ff;
+      cursor: pointer;
+      border-radius: 50%;
+      border: none;
+    }
   </style>
 </head>
 <body>
@@ -49,7 +77,7 @@
       <button id="stopBtn" disabled>Stop</button>
       <button id="clearBtn">Clear</button>
       <button id="randomBtn">Random</button>
-      <span class="info">Speed: <input type="range" id="speedSlider" min="1" max="20" value="10" style="width: 100px; vertical-align: middle;"></span>
+      <span class="info">Speed: <input type="range" id="speedSlider" min="1" max="20" value="10"></span>
       <span class="info">Generation: <span id="generation">0</span></span>
     </div>
     <div class="controls">
