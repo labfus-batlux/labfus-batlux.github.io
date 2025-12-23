@@ -243,21 +243,61 @@
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
+    // Fallback content for local file:// access
+    const fallbackMarkdown = `# Charlie Sands
+
+*+447375100147* | *cs@charliesands.com*
+
+## Experience
+
+**Fuse Energy**
+
+End-to-end ownership of gas business
+- Worked across engineering, design, trading, compliance, finance, and operations
+- Obtained licenses to supply and ship gas in the UK
+- Negotiated contracts across all consumables and service providers
+- Wrote product, engineering, and operations specs defining data architecture and business logic
+- Fuse gained £300M ARR within 2 months of product launch
+
+Hiring & Team Building
+- Interviewed and hired 100+ new staff
+
+Operations
+- Designed scalable routing and scheduling tool for DER installation business
+
+## Education
+
+- **NYU** · Politics & Aesthetics · 2020–2023
+- **Pratt Institute** · Fine Art · 2018–2019
+
+## Qualifications
+
+- Licensed Emergency Medical Technician · State of New York
+
+## Interests
+
+- Classical piano
+- Racket sports
+- Swimming`;
+
     let markdownText = '';
 
-    // Load markdown from cv.md
+    function renderMarkdown(text) {
+      markdownText = text;
+      // Skip the title line and contact line since we show title in header
+      const lines = text.split('\n');
+      const contentWithoutTitle = lines.slice(4).join('\n');
+      document.getElementById('content').innerHTML = marked.parse(contentWithoutTitle);
+    }
+
+    // Try to fetch cv.md, fall back to embedded content
     fetch('cv.md')
-      .then(response => response.text())
-      .then(text => {
-        markdownText = text;
-        // Skip the first h1 since we show it in header
-        const lines = text.split('\n');
-        const contentWithoutTitle = lines.slice(2).join('\n');
-        document.getElementById('content').innerHTML = marked.parse(contentWithoutTitle);
+      .then(response => {
+        if (!response.ok) throw new Error('Not found');
+        return response.text();
       })
-      .catch(err => {
-        document.getElementById('content').innerHTML = '<p>Error loading CV content.</p>';
-      });
+      .then(renderMarkdown)
+      .catch(() => renderMarkdown(fallbackMarkdown));
 
     // Theme toggle: moon in light mode (click for dark), sun in dark mode (click for light)
     function setTheme(dark) {
