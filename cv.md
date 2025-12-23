@@ -1,6 +1,6 @@
 # Charlie Sands
 
-*+447375100147* | *cs@charliesands.com*
+*+447375100147* · *cs@charliesands.com*
 
 ## Experience
 

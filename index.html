@@ -45,10 +45,21 @@
       margin-bottom: 24px;
       gap: 16px;
     }
-    .header-row h1 {
+    .header-title h1 {
       margin: 0;
       font-size: 20px;
       font-weight: 600;
+    }
+    .contact-info {
+      margin: 4px 0 0;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .contact-info a {
+      color: var(--text-muted);
+    }
+    .contact-info a:hover {
+      color: var(--text);
     }
 
     .copy-button-container {
@@ -192,7 +203,10 @@
 
   <main class="wrap">
     <div class="header-row">
-      <h1>Charlie Sands</h1>
+      <div class="header-title">
+        <h1>Charlie Sands</h1>
+        <p class="contact-info">+447375100147 · <a href="mailto:cs@charliesands.com">cs@charliesands.com</a></p>
+      </div>
       <div class="copy-button-container">
         <div class="copy-button-group">
           <button class="copy-btn" id="copyBtn">
@@ -246,7 +260,7 @@
     // Fallback content for local file:// access
     const fallbackMarkdown = `# Charlie Sands
 
-*+447375100147* | *cs@charliesands.com*
+*+447375100147* · *cs@charliesands.com*
 
 ## Experience
 
