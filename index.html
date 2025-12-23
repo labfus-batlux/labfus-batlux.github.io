@@ -6,132 +6,306 @@
   <title>Charlie Sands</title>
   <meta name="description" content="Charlie Sands" />
   <style>
-    html, body { background: #fff; color: #111; }
-    body { font: 16px/1.6 ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; margin: 0; }
+    :root {
+      --bg: #fff;
+      --text: #111;
+      --text-muted: #666;
+      --text-faint: #888;
+      --border: #ddd;
+      --btn-bg: #f5f5f5;
+      --btn-hover: #e8e8e8;
+      --dropdown-bg: #fff;
+      --dropdown-shadow: rgba(0,0,0,0.15);
+      --code-bg: #f5f5f5;
+      --hash-color: #999;
+    }
+    [data-theme="dark"] {
+      --bg: #1a1a1a;
+      --text: #e0e0e0;
+      --text-muted: #aaa;
+      --text-faint: #666;
+      --border: #444;
+      --btn-bg: transparent;
+      --btn-hover: #2a2a2a;
+      --dropdown-bg: #252525;
+      --dropdown-shadow: rgba(0,0,0,0.4);
+      --code-bg: #252525;
+      --hash-color: #666;
+    }
+    html, body { background: var(--bg); color: var(--text); }
+    body { font: 15px/1.6 ui-monospace, Menlo, "Cascadia Code", "Source Code Pro", Consolas, monospace; margin: 0; transition: background 0.2s, color 0.2s; }
     .wrap { max-width: 680px; margin: 48px auto; padding: 0 16px; }
-    h1 { font-size: 28px; margin: 0 0 16px; }
-    em { font-size: 14px; color: #333; }
-    .list { list-style: none; padding: 0; margin: 16px 0 28px; }
-    .list li { margin: 8px 0; }
     a { color: #2b59ff; text-decoration: none; }
     a:hover { text-decoration: underline; }
-    footer { margin-top: 48px; font-size: 14px; color: #444; }
-    .toggle-container {
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+      gap: 16px;
+    }
+    .header-row h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .copy-button-container {
+      position: relative;
+      flex-shrink: 0;
+    }
+    .copy-button-group {
+      display: flex;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .copy-btn {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 16px;
-    }
-    .toggle-label {
-      font-size: 14px;
-      color: #333;
-    }
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 48px;
-      height: 24px;
-    }
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-    .slider {
-      position: absolute;
+      padding: 8px 14px;
+      background: var(--btn-bg);
+      border: none;
+      color: var(--text);
+      font-size: 13px;
+      font-family: inherit;
       cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      transition: .3s;
-      border-radius: 24px;
+      transition: background 0.2s;
     }
-    .slider:before {
+    .copy-btn:hover { background: var(--btn-hover); }
+    .copy-btn svg { width: 16px; height: 16px; }
+    .dropdown-toggle {
+      display: flex;
+      align-items: center;
+      padding: 8px 10px;
+      background: var(--btn-bg);
+      border: none;
+      border-left: 1px solid var(--border);
+      color: var(--text);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: var(--btn-hover); }
+    .dropdown-toggle svg { width: 14px; height: 14px; }
+
+    .dropdown-menu {
       position: absolute;
-      content: "";
-      height: 18px;
-      width: 18px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: .3s;
-      border-radius: 50%;
+      top: 100%;
+      right: 0;
+      margin-top: 4px;
+      background: var(--dropdown-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 4px 16px var(--dropdown-shadow);
+      display: none;
+      min-width: 220px;
+      z-index: 100;
+      overflow: hidden;
     }
-    input:checked + .slider {
-      background-color: #2b59ff;
+    .dropdown-menu.open { display: block; }
+    .dropdown-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+      transition: background 0.2s;
     }
-    input:checked + .slider:before {
-      transform: translateX(24px);
+    .dropdown-item:hover { background: var(--btn-hover); }
+    .dropdown-item svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px; }
+    .dropdown-item-content { display: flex; flex-direction: column; }
+    .dropdown-item-title { font-weight: 500; }
+    .dropdown-item-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+    .copy-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--dropdown-bg);
+      color: var(--text);
+      padding: 10px 20px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
     }
-    #content h1 { font-size: 28px; margin: 0 0 16px; }
-    #content h2 { font-size: 20px; margin: 24px 0 12px; }
-    #content h3 { font-size: 18px; margin: 20px 0 10px; }
-    #content ul { list-style: disc; padding-left: 24px; }
-    #content li { margin: 6px 0; }
-    #content ul ul { list-style: circle; padding-left: 24px; }
-    #raw-markdown {
-      white-space: pre-wrap;
-      font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", monospace;
-      background: #f5f5f5;
-      padding: 16px;
-      border-radius: 4px;
-      font-size: 14px;
-      line-height: 1.5;
-      overflow-x: auto;
-    }
+    .copy-toast.show { opacity: 1; }
+
+    #content h1 { font-size: 20px; margin: 0 0 16px; font-weight: 600; }
+    #content h2 { font-size: 16px; margin: 28px 0 12px; font-weight: 600; }
+    #content h3 { font-size: 15px; margin: 20px 0 10px; font-weight: 600; }
+    #content p { margin: 8px 0; }
+    #content strong { font-weight: 600; }
+    #content ul { list-style: disc; padding-left: 20px; margin: 8px 0; }
+    #content li { margin: 4px 0; }
+    #content ul ul { list-style: circle; padding-left: 20px; }
+
     .hidden { display: none; }
+
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: transparent;
+      border: none;
+      padding: 4px;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: color 0.2s;
+    }
+    .theme-toggle:hover { color: var(--text); }
+    .theme-toggle svg { width: 20px; height: 20px; }
+    .theme-toggle svg.hidden { display: none; }
+
+    .footer-links { margin-top: 32px; font-size: 13px; color: var(--text-muted); }
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <div class="toggle-container">
-      <span class="toggle-label">render</span>
-      <label class="switch">
-        <input type="checkbox" id="toggleSwitch">
-        <span class="slider"></span>
-      </label>
-    </div>
-    <div id="content" class="hidden"></div>
-    <div id="raw-markdown"></div>
+  <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+    <svg id="sunIcon" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+    <svg id="moonIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+    </svg>
+  </button>
 
-    <p><a href="game-of-life.html">Grid</a> · <a href="contact.html">Contact</a></p>
+  <main class="wrap">
+    <div class="header-row">
+      <h1>Charlie Sands</h1>
+      <div class="copy-button-container">
+        <div class="copy-button-group">
+          <button class="copy-btn" id="copyBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            Copy page
+          </button>
+          <button class="dropdown-toggle" id="dropdownToggle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+        </div>
+        <div class="dropdown-menu" id="dropdownMenu">
+          <button class="dropdown-item" id="copyMenuItem">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span class="dropdown-item-content">
+              <span class="dropdown-item-title">Copy page</span>
+              <span class="dropdown-item-desc">Copy page as Markdown</span>
+            </span>
+          </button>
+          <button class="dropdown-item" id="viewMarkdownItem">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <span class="dropdown-item-content">
+              <span class="dropdown-item-title">View as Markdown ↗</span>
+              <span class="dropdown-item-desc">View this page as plain text</span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="content"></div>
+    <div id="copyToast" class="copy-toast">Copied to clipboard</div>
+
+    <p class="footer-links"><a href="game-of-life.html">Grid</a> · <a href="contact.html">Contact</a></p>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
     let markdownText = '';
-    let showingRaw = false;
 
-    // Load and display markdown
+    // Load markdown from cv.md
     fetch('cv.md')
       .then(response => response.text())
       .then(text => {
         markdownText = text;
-        document.getElementById('content').innerHTML = marked.parse(text);
-        document.getElementById('raw-markdown').textContent = text;
+        // Skip the first h1 since we show it in header
+        const lines = text.split('\n');
+        const contentWithoutTitle = lines.slice(2).join('\n');
+        document.getElementById('content').innerHTML = marked.parse(contentWithoutTitle);
       })
       .catch(err => {
         document.getElementById('content').innerHTML = '<p>Error loading CV content.</p>';
       });
 
-    // Toggle between rendered and raw markdown
-    document.getElementById('toggleSwitch').addEventListener('change', function() {
-      const content = document.getElementById('content');
-      const raw = document.getElementById('raw-markdown');
+    // Theme toggle: moon in light mode (click for dark), sun in dark mode (click for light)
+    function setTheme(dark) {
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      document.getElementById('moonIcon').classList.toggle('hidden', dark);
+      document.getElementById('sunIcon').classList.toggle('hidden', !dark);
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+    }
 
-      showingRaw = !this.checked; // Inverted: unchecked = raw, checked = rendered
+    // Initialize theme from preference or system
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setTheme(savedTheme ? savedTheme === 'dark' : prefersDark);
 
-      if (showingRaw) {
-        content.classList.add('hidden');
-        raw.classList.remove('hidden');
-      } else {
-        content.classList.remove('hidden');
-        raw.classList.add('hidden');
-      }
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      setTheme(!isDark);
+    });
+
+    // Copy to clipboard function
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        const toast = document.getElementById('copyToast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+      });
+    }
+
+    document.getElementById('copyBtn').addEventListener('click', () => copyToClipboard(markdownText));
+
+    document.getElementById('dropdownToggle').addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('dropdownMenu').classList.toggle('open');
+    });
+
+    document.addEventListener('click', () => document.getElementById('dropdownMenu').classList.remove('open'));
+
+    document.getElementById('copyMenuItem').addEventListener('click', () => {
+      copyToClipboard(markdownText);
+      document.getElementById('dropdownMenu').classList.remove('open');
+    });
+
+    document.getElementById('viewMarkdownItem').addEventListener('click', () => {
+      const blob = new Blob([markdownText], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      document.getElementById('dropdownMenu').classList.remove('open');
     });
   </script>
 </body>
 </html>
-
