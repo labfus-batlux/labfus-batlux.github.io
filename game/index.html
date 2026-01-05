@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Grid - Charlie Sands</title>
+  <title>Game - Charlie Sands</title>
   <style>
     html, body { background: #fff; color: #111; margin: 0; padding: 0; }
     body { font: 16px/1.6 ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; }
@@ -22,6 +22,14 @@
     button:hover { background: #1e42cc; }
     button:disabled { background: #ccc; cursor: not-allowed; }
     button.active { background: #ff5722; }
+    #startBtn { background: #4caf50; }
+    #startBtn:hover { background: #45a049; }
+    #stopBtn { background: #f44336; }
+    #stopBtn:hover { background: #da190b; }
+    #clearBtn { background: #757575; }
+    #clearBtn:hover { background: #616161; }
+    #randomBtn { background: #9c27b0; }
+    #randomBtn:hover { background: #7b1fa2; }
     #canvas {
       border: 1px solid #ddd;
       cursor: crosshair;
@@ -32,19 +40,44 @@
     .back { margin-top: 24px; font-size: 14px; }
     a { color: #2b59ff; text-decoration: none; }
     a:hover { text-decoration: underline; }
+    #speedSlider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100px;
+      height: 6px;
+      background: #ddd;
+      outline: none;
+      border-radius: 3px;
+      vertical-align: middle;
+      cursor: pointer;
+    }
+    #speedSlider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      background: #2b59ff;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+    #speedSlider::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      background: #2b59ff;
+      cursor: pointer;
+      border-radius: 50%;
+      border: none;
+    }
   </style>
 </head>
 <body>
   <main class="wrap">
-    <h1>Grid</h1>
-    <p class="info" id="instructions">Click cells to toggle them. Press Start to begin simulation.</p>
-
     <div class="controls">
       <button id="startBtn">Start</button>
       <button id="stopBtn" disabled>Stop</button>
       <button id="clearBtn">Clear</button>
       <button id="randomBtn">Random</button>
-      <span class="info">Speed: <input type="range" id="speedSlider" min="1" max="20" value="10" style="width: 100px; vertical-align: middle;"></span>
+      <span class="info">Speed: <input type="range" id="speedSlider" min="1" max="20" value="10"></span>
       <span class="info">Generation: <span id="generation">0</span></span>
     </div>
     <div class="controls">
@@ -58,7 +91,9 @@
 
     <canvas id="canvas" width="600" height="400"></canvas>
 
-    <p class="back"><a href="index.html">← Back to home</a></p>
+    <p class="info" id="instructions">Click cells to toggle them. Press Start to begin simulation.</p>
+
+    <p class="back"><a href="/">← Back to home</a></p>
   </main>
 
   <script>
@@ -320,26 +355,37 @@
         }
       }
 
+      grid = newGrid;
+      colors = newColors;
+
       // Check for complete rows and remove them
-      for (let i = 0; i < rows; i++) {
+      let rowsCleared = false;
+      for (let i = rows - 1; i >= 0; i--) {
         let complete = true;
         for (let j = 0; j < cols; j++) {
-          if (newGrid[i][j] === 0) {
+          if (grid[i][j] === 0) {
             complete = false;
             break;
           }
         }
         if (complete) {
-          // Clear the row
-          for (let j = 0; j < cols; j++) {
-            newGrid[i][j] = 0;
-            newColors[i][j] = 0;
+          rowsCleared = true;
+          // Shift all rows above down
+          for (let k = i; k > 0; k--) {
+            for (let j = 0; j < cols; j++) {
+              grid[k][j] = grid[k - 1][j];
+              colors[k][j] = colors[k - 1][j];
+            }
           }
+          // Clear the top row
+          for (let j = 0; j < cols; j++) {
+            grid[0][j] = 0;
+            colors[0][j] = 0;
+          }
+          // Check the same row again since we shifted down
+          i++;
         }
       }
-
-      grid = newGrid;
-      colors = newColors;
 
       // Stop if no shapes moved and no rows were cleared
       if (!anyShapeMoved && generation > 0) {
@@ -359,6 +405,49 @@
       floodFillTetrisShape(row + 1, col, color, visited, shapeCells);
       floodFillTetrisShape(row, col - 1, color, visited, shapeCells);
       floodFillTetrisShape(row, col + 1, color, visited, shapeCells);
+    }
+
+    function floodFillIgnoreColor(row, col, visited, shapeCells) {
+      if (row < 0 || row >= rows || col < 0 || col >= cols) return;
+      if (visited[row][col] === 1 || grid[row][col] === 0) return;
+
+      visited[row][col] = 1;
+      shapeCells.push([row, col]);
+
+      floodFillIgnoreColor(row - 1, col, visited, shapeCells);
+      floodFillIgnoreColor(row + 1, col, visited, shapeCells);
+      floodFillIgnoreColor(row, col - 1, visited, shapeCells);
+      floodFillIgnoreColor(row, col + 1, visited, shapeCells);
+    }
+
+    function mergeTouchingShapes() {
+      // After shapes have fallen, merge any shapes that are touching
+      const visited = createGrid();
+
+      // Identify all shapes (groups of connected cells, ignoring color)
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          if (grid[i][j] === 1 && visited[i][j] === 0) {
+            const shapeCells = [];
+            // Flood fill ignoring color differences
+            floodFillIgnoreColor(i, j, visited, shapeCells);
+
+            // Find all unique colors in this shape
+            const colorsInShape = new Set();
+            for (const [r, c] of shapeCells) {
+              colorsInShape.add(colors[r][c]);
+            }
+
+            // If multiple colors exist, unify them to the first color
+            if (colorsInShape.size > 1) {
+              const unifiedColor = colors[shapeCells[0][0]][shapeCells[0][1]];
+              for (const [r, c] of shapeCells) {
+                colors[r][c] = unifiedColor;
+              }
+            }
+          }
+        }
+      }
     }
 
     function nextAnt() {
@@ -913,6 +1002,9 @@
           }
           // Assign adjacent color if found, otherwise random
           colors[row][col] = adjacentColor || tetrisColors[Math.floor(Math.random() * tetrisColors.length)];
+
+          // Merge touching shapes when user manually connects them
+          mergeTouchingShapes();
         }
       } else if (gameMode === 'ant') {
         grid[row][col] = grid[row][col] === 1 ? 0 : 1;
@@ -991,7 +1083,7 @@
     antBtn.addEventListener('click', applyAnt);
     sandpileBtn.addEventListener('click', applySandpile);
     wireworldBtn.addEventListener('click', applyWireworld);
-    speedSlider.addEventListener('input', updateSpeed);
+    speedSlider.addEventListener('change', updateSpeed);
 
     // Initial draw
     updateInstructions();
