@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Body Without Organs - Charlie Sands</title>
+  <link rel="stylesheet" href="../shared.css" />
+  <style>
+    #content h1 { font-size: 20px; margin: 0 0 16px; font-weight: 600; }
+    #content h2 { font-size: 16px; margin: 28px 0 12px; font-weight: 600; }
+    #content h3 { font-size: 15px; margin: 20px 0 10px; font-weight: 600; }
+    #content p { margin: 8px 0; }
+    #content strong { font-weight: 600; }
+    #content ul { list-style: disc; padding-left: 20px; margin: 8px 0; }
+    #content li { margin: 4px 0; }
+    #content ul ul { list-style: circle; padding-left: 20px; }
+    #content blockquote { border-left: 3px solid var(--border); margin: 16px 0; padding: 8px 16px; color: var(--text-muted); }
+    #content code { background: var(--code-bg); padding: 2px 6px; border-radius: 3px; font-size: 14px; }
+    #content pre { background: var(--code-bg); padding: 16px; border-radius: 6px; overflow-x: auto; }
+    #content pre code { background: none; padding: 0; }
+    #content table { border-collapse: collapse; margin: 16px 0; width: 100%; }
+    #content th, #content td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+    #content th { background: var(--code-bg); font-weight: 600; }
+    .back-link { margin-top: 32px; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+    <svg id="sunIcon" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+    <svg id="moonIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+    </svg>
+  </button>
+
+  <div class="nav-bar">
+    <nav class="site-nav">
+      <a class="site-name" href="../index.html">Charlie Sands</a>
+      <div class="nav-links">
+        <a href="../index.html">CV</a><span class="sep">·</span>
+        <a href="../pictures/index.html">Pictures</a><span class="sep">·</span>
+        <a href="../writing/index.html" class="active">Writing</a><span class="sep">·</span>
+        <a href="../links/index.html">Links</a><span class="sep">·</span>
+        <a href="../game/index.html">Game</a>
+      </div>
+    </nav>
+  </div>
+
+  <main class="wrap">
+    <h1>Body Without Organs</h1>
+    <div id="content"></div>
+    <p class="back-link"><a href="index.html">← Back to writing</a></p>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="../shared.js"></script>
+  <script>
+    function stripFrontmatter(text) {
+      const match = text.match(/^---\n[\s\S]*?\n---\n/);
+      return match ? text.slice(match[0].length) : text;
+    }
+
+    function stripWikiLinks(text) {
+      text = text.replace(/\[\[([^\]]*?)\|([^\]]*?)\]\]/g, '$2');
+      text = text.replace(/\[\[([^\]]*?)\]\]/g, '$1');
+      return text;
+    }
+
+    function render(text) {
+      text = stripFrontmatter(text);
+      text = stripWikiLinks(text);
+      document.getElementById('content').innerHTML = marked.parse(text);
+    }
+
+    const fallback = `---
+created: 2026-01-07
+categories: [Philosophy, Critical Theory, Post-Structuralism]
+tags: [deleuze, guattari, desire, immanence, assemblages]
+---
+
+# Body Without Organs
+
+Concept from [[Gilles Deleuze]] and [[Félix Guattari]] in [[Anti-Oedipus]] and [[A Thousand Plateaus]] - not a body lacking organs, but a body freed from *organisation*.
+
+## Core Idea
+
+**Not anatomical** - refers to the way bodies are *organised*
+- Organs impose fixed functions
+- BwO = potential before organisation constrains it
+- Plane of [[Immanence]] where desire flows freely
+
+**Against the Organism**
+- Organism = hierarchical organisation of body
+- BwO opposes stratification, not organs themselves
+- "The enemy is the organism" - rigid functional assignments
+
+## Origins
+
+**Artaud's Influence**
+- Term from [[Antonin Artaud]] - schizophrenic poet
+- "To be done with the judgment of god"
+- Body as intensity, not utility
+
+**Spinozan Roots**
+- "What can a body do?" - [[Spinoza]]
+- Body defined by capacities, affects
+- Not by organs or structure
+
+## Types of BwO
+
+**Full BwO**
+- Productive, life-affirming
+- Allows flows, connections
+- Nomadic, experimental
+
+**Empty BwO**
+- Cancerous, destructive
+- Hypochondriac, paranoid, drugged
+- Blocks all flows - "fascist BwO"
+
+**Key Distinction**
+- Good BwO = destratification that enables new connections
+- Bad BwO = total destratification (death, catatonia)
+
+## How to Make One
+
+Deleuze/Guattari's instructions:
+1. Lodge on a [[Stratum]] - don't abandon it recklessly
+2. Experiment carefully
+3. Find potential movements, flows
+4. Avoid mimicry, avoid suicide
+
+"You never reach the BwO, you can't reach it, you are forever attaining it"
+
+## Connections to Desire
+
+**Desiring-Machines**
+- BwO is surface where [[Desiring-Machines]] attach
+- Desire = productive, not lack-based
+- Against [[Psychoanalysis|Freudian]] interpretation
+
+**Anti-Oedipal**
+- Rejects Oedipal triangulation (mommy-daddy-me)
+- Desire flows across BwO freely
+- Social, not familial
+
+**Against [[Jacques Lacan|Lacan]]**
+- Rejects desire as lack ([[Object a]])
+- [[Jouissance]] without castration
+- Productive unconscious vs structured unconscious
+- But: both engage [[The Real]] (differently)
+
+## Examples
+
+- Masochist's body - reorganises pain/pleasure
+- Hypochondriac body - organs in wrong places
+- Drugged body - altered intensities
+- Schizo body - decoded flows
+- Tantric body - erotic as full-body intensity
+
+## The LPG as Body Without Organs
+
+**[[Synthesis - Music|Synthesis]] Connection**
+
+The [[Synthesis - Music|Low Pass Gate]] embodies the BwO:
+- Combines filter (organisation) and amplifier (intensity)
+- [[Don Buchla|Vactrol]]-based - organic, unpredictable response curves
+- Creates "natural" sounds without ADSR (no symbolic articulation)
+- Simultaneous amplitude and timbral flux
+- Refuses separation of loudness from brightness
+
+**Sound Before the Organism**
+- LPG = sound before organs assign functions
+- [[Synthesis - Music|West Coast synthesis]] = molecular vs molar
+- Waveshaping = adding intensities (vs subtractive filtering)
+- Feedback patching = rhizomatic connections
+
+**[[Gilbert Simondon|Simondon]] Connection**
+- BwO relates to pre-individual reality
+- Metastability before individuation
+- Transduction across intensities
+- Both Deleuze and synthesis explore becoming
+
+## Political Dimension
+
+**Capitalism & BwO**
+- Capital as "socius" - organises bodies for production
+- BwO resists capture by [[Capitalism|capitalist]] organisation
+- Revolutionary potential in becoming-other
+
+**Micropolitics**
+- Personal BwO experiments = political acts
+- Transformation of desire, not just ideology
+- [[Schizoanalysis]] as method
+
+## Key Quotes
+
+> "The BwO is what remains when you take everything away"
+
+> "Dismantling the organism has never meant killing yourself"
+
+## Against [[G.W.F. Hegel|Hegel]]
+
+**The Anti-Dialectical Project**
+- [[Gilles Deleuze|Deleuze]]'s *Difference and Repetition* (1968): explicit anti-Hegelianism
+- Difference without negation — not thesis/antithesis
+- Multiplicity without [[Aufhebung]] — no resolution into One
+- BwO as escape from [[Dialectic|dialectical]] totality
+
+**Critique of [[Aufhebung]]**
+- Aufhebung = recuperation, capture
+- Every transgression sublated back into system
+- Hegel: difference resolved into identity
+- D&G: difference affirmed as irreducible
+
+**Yet Structurally Hegelian?**
+
+| [[G.W.F. Hegel\\|Hegelian]] | D&G Equivalent |
+|---------------------------|----------------|
+| Thesis | Stratum (organised) |
+| Antithesis | Line of flight (escape) |
+| Synthesis | New assemblage |
+| Spirit's self-development | Becoming |
+
+*The difference*: for Hegel, synthesis is *goal*; for D&G, it's *trap*
+
+**BwO vs [[Geist|Spirit]]**
+- [[Geist]]: collective consciousness developing through history
+- BwO: surface of pure intensity *before* subjectivity
+- Hegel: subject as achievement of dialectic
+- D&G: subject as limitation to be overcome
+- BwO = what remains when you subtract [[Aufhebung]]
+
+**[[Slavoj Žižek|Žižek]]'s Response**
+- D&G secretly more Hegelian than they admit
+- Their "difference" still opposes identity (thus dialectical)
+- True escape from Hegel requires engaging him
+- BwO might be Hegelian Absolute misunderstood
+
+## Related
+- [[Gilles Deleuze]]
+- [[Félix Guattari]]
+- [[Anti-Oedipus]]
+- [[A Thousand Plateaus]]
+- [[Desiring-Machines]]
+- [[Gilbert Simondon]]
+- [[Flows and Transformations]]
+- [[Cybernetics]]
+- [[Nick Land]]
+- [[Accelerationism]]
+- [[CCRU]]
+- [[Jacques Lacan]]
+- [[Jouissance]]
+- [[The Real]]
+- [[Synthesis - Music]]
+- [[Don Buchla]]
+- [[Gradient Descent]]
+- [[G.W.F. Hegel]]
+- [[Dialectic]]
+- [[Aufhebung]]
+- [[Geist]]
+- [[Slavoj Žižek]]`;
+
+    fetch('Body Without Organs.md')
+      .then(r => { if (!r.ok) throw new Error(); return r.text(); })
+      .then(render)
+      .catch(() => render(fallback));
+  </script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pictures · Charlie Sands</title>
+  <link rel="stylesheet" href="../shared.css" />
+  <style>
+    .wrap { max-width: 900px; }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .gallery-item {
+      aspect-ratio: 1;
+      overflow: hidden;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.2s;
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.03);
+    }
+
+    @media (max-width: 768px) {
+      .gallery { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 480px) {
+      .gallery { grid-template-columns: 1fr; }
+    }
+
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.9);
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .lightbox.open {
+      display: flex;
+    }
+
+    .lightbox img {
+      max-width: 90vw;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+    <svg id="sunIcon" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+    <svg id="moonIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+    </svg>
+  </button>
+
+  <div class="nav-bar">
+    <nav class="site-nav">
+      <a class="site-name" href="../index.html">Charlie Sands</a>
+      <div class="nav-links">
+        <a href="../index.html">CV</a><span class="sep">·</span>
+        <a href="../pictures/index.html" class="active">Pictures</a><span class="sep">·</span>
+        <a href="../writing/index.html">Writing</a><span class="sep">·</span>
+        <a href="../links/index.html">Links</a><span class="sep">·</span>
+        <a href="../game/index.html">Game</a>
+      </div>
+    </nav>
+  </div>
+
+  <div class="wrap">
+    <div class="gallery">
+      <div class="gallery-item"><img src="IMG_0188.jpg" alt="" loading="lazy" /></div>
+      <div class="gallery-item"><img src="IMG_0189.jpg" alt="" loading="lazy" /></div>
+      <div class="gallery-item"><img src="IMG_0191.jpg" alt="" loading="lazy" /></div>
+      <div class="gallery-item"><img src="IMG_0192.jpg" alt="" loading="lazy" /></div>
+      <div class="gallery-item"><img src="IMG_0193.jpg" alt="" loading="lazy" /></div>
+      <div class="gallery-item"><img src="IMG_0196.jpg" alt="" loading="lazy" /></div>
+      <div class="gallery-item"><img src="f1214bbf-8202-45b7-9044-3737b8cd99cc.1280x1280.jpg" alt="" loading="lazy" /></div>
+      <div class="gallery-item"><img src="dfc82edc-c6d2-413b-a15a-67aad7d955aa.1280x1280.jpg" alt="" loading="lazy" /></div>
+      <div class="gallery-item"><img src="200c0376-b3c3-4ce4-9fde-aedb7fdcc9f8.1280x1280.jpg" alt="" loading="lazy" /></div>
+      <div class="gallery-item"><img src="%20%20.jpg" alt="" loading="lazy" /></div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox">
+    <img id="lightboxImg" src="" alt="" />
+  </div>
+
+  <script src="../shared.js"></script>
+  <script>
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+
+    document.querySelectorAll('.gallery-item img').forEach(img => {
+      img.addEventListener('click', () => {
+        lightboxImg.src = img.src;
+        lightbox.classList.add('open');
+      });
+    });
+
+    lightbox.addEventListener('click', () => {
+      lightbox.classList.remove('open');
+      lightboxImg.src = '';
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && lightbox.classList.contains('open')) {
+        lightbox.classList.remove('open');
+        lightboxImg.src = '';
+      }
+    });
+  </script>
+</body>
+</html>

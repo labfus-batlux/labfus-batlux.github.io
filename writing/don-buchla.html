@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Don Buchla - Charlie Sands</title>
+  <link rel="stylesheet" href="../shared.css" />
+  <style>
+    #content h1 { font-size: 20px; margin: 0 0 16px; font-weight: 600; }
+    #content h2 { font-size: 16px; margin: 28px 0 12px; font-weight: 600; }
+    #content h3 { font-size: 15px; margin: 20px 0 10px; font-weight: 600; }
+    #content p { margin: 8px 0; }
+    #content strong { font-weight: 600; }
+    #content ul { list-style: disc; padding-left: 20px; margin: 8px 0; }
+    #content li { margin: 4px 0; }
+    #content ul ul { list-style: circle; padding-left: 20px; }
+    #content blockquote { border-left: 3px solid var(--border); margin: 16px 0; padding: 8px 16px; color: var(--text-muted); }
+    #content code { background: var(--code-bg); padding: 2px 6px; border-radius: 3px; font-size: 14px; }
+    #content pre { background: var(--code-bg); padding: 16px; border-radius: 6px; overflow-x: auto; }
+    #content pre code { background: none; padding: 0; }
+    #content table { border-collapse: collapse; margin: 16px 0; width: 100%; }
+    #content th, #content td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+    #content th { background: var(--code-bg); font-weight: 600; }
+    .back-link { margin-top: 32px; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+    <svg id="sunIcon" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+    <svg id="moonIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+    </svg>
+  </button>
+
+  <div class="nav-bar">
+    <nav class="site-nav">
+      <a class="site-name" href="../index.html">Charlie Sands</a>
+      <div class="nav-links">
+        <a href="../index.html">CV</a><span class="sep">·</span>
+        <a href="../pictures/index.html">Pictures</a><span class="sep">·</span>
+        <a href="../writing/index.html" class="active">Writing</a><span class="sep">·</span>
+        <a href="../links/index.html">Links</a><span class="sep">·</span>
+        <a href="../game/index.html">Game</a>
+      </div>
+    </nav>
+  </div>
+
+  <main class="wrap">
+    <h1>Don Buchla</h1>
+    <div id="content"></div>
+    <p class="back-link"><a href="index.html">← Back to writing</a></p>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="../shared.js"></script>
+  <script>
+    function stripFrontmatter(text) {
+      const match = text.match(/^---\n[\s\S]*?\n---\n/);
+      return match ? text.slice(match[0].length) : text;
+    }
+
+    function stripWikiLinks(text) {
+      text = text.replace(/\[\[([^\]]*?)\|([^\]]*?)\]\]/g, '$2');
+      text = text.replace(/\[\[([^\]]*?)\]\]/g, '$1');
+      return text;
+    }
+
+    function render(text) {
+      text = stripFrontmatter(text);
+      text = stripWikiLinks(text);
+      document.getElementById('content').innerHTML = marked.parse(text);
+    }
+
+    const fallback = `---
+created: 2026-01-07
+categories: [Electronic Music, Sound Synthesis, Composers]
+tags: [synthesisers, modular-synthesis, west-coast-synthesis, instrument-designers]
+---
+
+# Don Buchla
+
+American instrument designer (1937-2016) - founder of [[Synthesis - Music|West Coast synthesis]]. Rejected keyboards in favour of touch-sensitive interfaces. Built instruments for exploration, not imitation.
+
+## Life
+
+- Born South Orange, New Jersey
+- Physics + physiology background
+- [[San Francisco Tape Music Center]] - met [[Morton Subotnick]], [[Pauline Oliveros]]
+- Founded Buchla & Associates (1963)
+- Died September 2016, Berkeley
+
+## Instruments
+
+**Buchla 100 Series (1963)**
+- First modular synth (parallel to [[Robert Moog|Moog]])
+- Commissioned by [[Morton Subotnick]] + [[Ramon Sender]]
+- Touch-controlled, not keyboard
+- [[San Francisco Tape Music Center]] installation
+
+**Buchla 200 Series (1970)**
+- Expanded modular system
+- 259 Programmable Complex Waveform Generator
+- 281 Quad Function Generator
+- 266 Source of Uncertainty - controlled randomness
+- 292 Quad Low Pass Gate
+
+**Buchla Music Easel (1973)**
+- Portable, self-contained
+- Complete West Coast voice
+- Cult instrument - modern reissues
+
+**Later Systems**
+- 300 Series - hybrid digital/analogue
+- 700 - digital
+- 200e (2004) - modern remake with presets
+
+## Key Innovations
+
+**[[Low Pass Gate|Low Pass Gates]]**
+- Combined VCF + VCA
+- [[Vactrol]]-based (LED + photoresistor)
+- Natural, organic decay
+- "Bongo" character
+
+**Complex Oscillators**
+- [[Waveshaping]] built-in
+- Wavefolding for harmonic control
+- FM capabilities
+- Timbre as primary parameter
+
+**Touch Plates**
+- Capacitive touch interfaces
+- Rejected keyboard paradigm
+- Position + pressure sensitive
+- Encouraged exploration over virtuosity
+
+**Source of Uncertainty**
+- Controlled randomness module
+- Fluctuating + sampled random outputs
+- Influenced by [[John Cage]]
+- Generative composition tool
+
+## Philosophy
+
+- Instruments should suggest, not dictate
+- Against keyboard hegemony
+- "Electronic instrument" not "synthesiser"
+- Exploration over reproduction
+- Performer as collaborator with machine
+
+## Influence
+
+- [[Morton Subotnick]] - primary collaborator
+- [[Suzanne Ciani]] - Buchla performer
+- [[Pauline Oliveros]] - Tape Music Center colleague
+- [[Make Noise]] - modern West Coast revival
+- [[Mutable Instruments]] - digital implementations
+
+## Related
+- [[Synthesis - Music]]
+- [[Robert Moog]]
+- [[Morton Subotnick]]
+- [[Pauline Oliveros]]
+- [[Signal Processing]]
+- [[Harmonics]]`;
+
+    fetch('Don Buchla.md')
+      .then(r => { if (!r.ok) throw new Error(); return r.text(); })
+      .then(render)
+      .catch(() => render(fallback));
+  </script>
+</body>
+</html>
