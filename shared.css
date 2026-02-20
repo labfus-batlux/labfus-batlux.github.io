@@ -37,7 +37,8 @@ body::before {
   opacity: var(--grain-opacity); mix-blend-mode: multiply;
 }
 
-html, body { background: var(--bg); color: var(--text); }
+html, body { background: var(--bg); color: var(--text); cursor: none; }
+a, button, input, [role="button"], summary { cursor: none; }
 body { font: 16px/1.8 'EB Garamond', 'Georgia', serif; margin: 0; transition: background 0.5s, color 0.5s; }
 h1, h2, h3, h4, h5, h6 { font-family: 'Cormorant', 'Georgia', serif; font-weight: 300; text-transform: lowercase; letter-spacing: 0.03em; }
 a { color: #5E8B7E; text-decoration: none; transition: color 0.4s; }
@@ -65,6 +66,35 @@ nav.site-nav .nav-links .sep { color: var(--text-faint); user-select: none; font
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border); }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* Cursor blob — inverts theme under a morphing lens */
+.cursor-blob {
+  position: fixed;
+  width: 180px;
+  height: 180px;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  backdrop-filter: invert(1) sepia(0.12) saturate(0.9);
+  -webkit-backdrop-filter: invert(1) sepia(0.12) saturate(0.9);
+  opacity: 0;
+  transition: opacity 0.6s;
+  animation: blob-morph 8s ease-in-out infinite;
+  will-change: transform, left, top;
+}
+.cursor-blob.visible { opacity: 1; }
+
+@keyframes blob-morph {
+  0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  25%      { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+  50%      { border-radius: 50% 60% 30% 60% / 30% 50% 70% 50%; }
+  75%      { border-radius: 40% 60% 50% 40% / 60% 30% 60% 40%; }
+}
+
+@media (pointer: coarse) {
+  .cursor-blob { display: none; }
+  html, body, a, button, input, [role="button"], summary { cursor: auto; }
+}
 
 @media (max-width: 600px) {
   nav.site-nav { flex-direction: column; align-items: flex-start; gap: 10px; }
