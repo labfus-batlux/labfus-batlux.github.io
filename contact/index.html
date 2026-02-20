@@ -5,26 +5,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Contact - Charlie Sands</title>
   <meta name="description" content="Contact Charlie Sands" />
+  <link rel="stylesheet" href="../shared.css" />
   <style>
-    html, body { background: #fff; color: #111; }
-    body { font: 16px/1.6 ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; margin: 0; }
-    .wrap { max-width: 680px; margin: 48px auto; padding: 0 16px; }
-    h1 { font-size: 28px; margin: 0 0 16px; }
-    .contact-list { list-style: none; padding: 0; margin: 24px 0; }
-    .contact-list li { margin: 12px 0; }
-    a { color: #2b59ff; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    .back { margin-top: 32px; font-size: 14px; }
+    .contact-heading { font-family: 'Cormorant', serif; font-size: 28px; font-weight: 300; text-transform: lowercase; margin: 0 0 48px; }
+    .contact-list { list-style: none; padding: 0; margin: 0; }
+    .contact-list li { margin: 16px 0; font-size: 15px; }
+    .contact-list li strong { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 400; text-transform: lowercase; color: var(--text-muted); display: block; margin-bottom: 4px; opacity: 0.5; }
+    .back { margin-top: 64px; font-size: 12px; opacity: 0.4; }
   </style>
 </head>
 <body>
+  <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+    <svg id="sunIcon" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+    <svg id="moonIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+    </svg>
+  </button>
+  <div class="nav-bar">
+    <nav class="site-nav">
+      <a class="site-name" href="../index.html">Charlie Sands</a>
+      <div class="nav-links">
+        <a href="../index.html">CV</a><span class="sep">·</span>
+        <a href="../pictures/index.html">Pictures</a><span class="sep">·</span>
+        <a href="../writing/index.html">Writing</a><span class="sep">·</span>
+        <a href="../links/index.html">Links</a><span class="sep">·</span>
+        <a href="../game/index.html">Game</a>
+      </div>
+    </nav>
+  </div>
   <main class="wrap">
-    <h1>Contact</h1>
+    <h1 class="contact-heading">contact</h1>
     <ul class="contact-list">
-      <li><strong>Email:</strong> <a href="mailto:cs@charliesands.com">cs@charliesands.com</a></li>
-      <li><strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/charlie-sands-80a280375/" target="_blank" rel="noopener noreferrer">charlie-sands-80a280375</a></li>
+      <li><strong>email</strong> <a href="mailto:cs@charliesands.com">cs@charliesands.com</a></li>
+      <li><strong>linkedin</strong> <a href="https://www.linkedin.com/in/charlie-sands-80a280375/" target="_blank" rel="noopener noreferrer">charlie-sands-80a280375</a></li>
     </ul>
-    <p class="back"><a href="/">← Back to home</a></p>
+    <p class="back"><a href="/">← back to home</a></p>
   </main>
+  <script src="../shared.js"></script>
 </body>
 </html>

@@ -6,64 +6,25 @@
   <title>Game - Charlie Sands</title>
   <link rel="stylesheet" href="../shared.css">
   <style>
-    .wrap { max-width: 800px; }
-    h1 { font-size: 24px; margin: 0 0 16px; }
-    .controls { margin: 16px 0; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-    button {
-      padding: 8px 16px;
-      background: #2b59ff;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    button:hover { background: #1e42cc; }
-    button:disabled { background: #ccc; cursor: not-allowed; }
-    button.active { background: #ff5722; }
-    #startBtn { background: #4caf50; }
-    #startBtn:hover { background: #45a049; }
-    #stopBtn { background: #f44336; }
-    #stopBtn:hover { background: #da190b; }
-    #clearBtn { background: #757575; }
-    #clearBtn:hover { background: #616161; }
-    #randomBtn { background: #9c27b0; }
-    #randomBtn:hover { background: #7b1fa2; }
-    #canvas {
-      border: 1px solid #ddd;
-      cursor: crosshair;
-      display: block;
-      margin: 16px 0;
-    }
-    .info { font-size: 14px; color: #555; margin: 8px 0; }
-    #speedSlider {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 100px;
-      height: 6px;
-      background: #ddd;
-      outline: none;
-      border-radius: 3px;
-      vertical-align: middle;
-      cursor: pointer;
-    }
-    #speedSlider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 16px;
-      height: 16px;
-      background: #2b59ff;
-      cursor: pointer;
-      border-radius: 50%;
-    }
-    #speedSlider::-moz-range-thumb {
-      width: 16px;
-      height: 16px;
-      background: #2b59ff;
-      cursor: pointer;
-      border-radius: 50%;
-      border: none;
-    }
+    .wrap { max-width: 700px; }
+    .controls { margin: 16px 0; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    button { padding: 8px 20px; background: transparent; color: var(--text); border: 1px solid var(--border); cursor: pointer; font-size: 13px; font-family: 'EB Garamond', serif; transition: border-color 0.4s, color 0.4s; border-radius: 0; }
+    button:hover { border-color: var(--text-muted); }
+    button:disabled { opacity: 0.3; cursor: not-allowed; }
+    button.active { border-color: #5E8B7E; color: #5E8B7E; }
+    #startBtn { border-color: var(--border); color: var(--text); }
+    #startBtn:hover { border-color: var(--text-muted); }
+    #stopBtn { border-color: var(--border); color: var(--text); }
+    #stopBtn:hover { border-color: var(--text-muted); }
+    #clearBtn { border-color: var(--border); color: var(--text); }
+    #clearBtn:hover { border-color: var(--text-muted); }
+    #randomBtn { border-color: var(--border); color: var(--text); }
+    #randomBtn:hover { border-color: var(--text-muted); }
+    #canvas { border: 1px solid var(--border); cursor: crosshair; display: block; margin: 16px 0; }
+    .info { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-muted); margin: 8px 0; opacity: 0.5; }
+    #speedSlider { -webkit-appearance: none; appearance: none; width: 100px; height: 4px; background: var(--border); outline: none; border-radius: 0; vertical-align: middle; cursor: pointer; }
+    #speedSlider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 12px; height: 12px; background: #8A7E72; cursor: pointer; border-radius: 0; border: none; }
+    #speedSlider::-moz-range-thumb { width: 12px; height: 12px; background: #8A7E72; cursor: pointer; border-radius: 0; border: none; }
   </style>
 </head>
 <body>
