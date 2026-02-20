@@ -24,10 +24,18 @@ document.getElementById('themeToggle').addEventListener('click', () => {
 
   let mouseX = -200, mouseY = -200;
   let blobX = -200, blobY = -200;
+  let firstMove = true;
 
   document.addEventListener('mousemove', function(e) {
     mouseX = e.clientX;
     mouseY = e.clientY;
+    if (firstMove) {
+      blobX = mouseX;
+      blobY = mouseY;
+      blob.style.left = blobX + 'px';
+      blob.style.top = blobY + 'px';
+      firstMove = false;
+    }
     blob.classList.add('visible');
   });
 
