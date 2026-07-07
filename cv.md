@@ -1,23 +1,28 @@
 # Charlie Sands
 
-*+447375100147* · *cs@charliesands.com*
+*cs@charliesands.com*
 
 ## Experience
 
-**Fuse Energy**
+**Foresight Data Machines** · Contractor · 2026
 
-End-to-end ownership of gas business
-- Worked across engineering, design, trading, compliance, finance, and operations
-- Obtained licenses to supply and ship gas in the UK
-- Negotiated contracts across all consumables and service providers
-- Wrote product, engineering, and operations specs defining data architecture and business logic
-- Fuse gained £300M ARR within 2 months of product launch
+- Created a business plan to fund and operationalise the UK's most strategically critical large scale steel mill.
+- Worked with senior officials at the Department of Business and Trade and No. 10.
 
-Hiring & Team Building
-- Interviewed and hired 100+ new staff
+**Seamflow** · Contractor · 2026
 
-Operations
-- Designed scalable routing and scheduling tool for DER installation business
+- Created business plan to verticalise a £5M seed stage startup, working directly with CEO.
+
+**Fuse Energy** · Snr. Operations Manager · 2023-2026
+
+- Employee 20 at one of the UK's fastest growing startups, working directly with COO and CEO.
+- End-to-end ownership of gas business:
+    - Worked across engineering, design, trading, compliance, finance, and operations to build and scale a revenue stream responsible for £300M in ARR.
+    - Obtained licenses to supply and ship gas in the UK. These were the first supply licenses granted to an energy supplier in over 4 years.
+    - Negotiated contracts across all consumables and service providers.
+    - Wrote product, engineering, and operations specs defining data architecture and business logic.
+- Interviewed and hired 100+ new staff.
+- Designed scalable routing and scheduling tool for DER installation business.
 
 ## Education
 
@@ -27,9 +32,3 @@ Operations
 ## Qualifications
 
 - Licensed Emergency Medical Technician · State of New York
-
-## Interests
-
-- Classical piano
-- Racket sports
-- Swimming
