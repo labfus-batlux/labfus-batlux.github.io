@@ -29,8 +29,8 @@ document.getElementById('themeToggle').addEventListener('click', () => {
 
   // Spring physics: higher stiffness = snappier / easier to fling around,
   // lower damping = more momentum, bounce and overshoot.
-  const stiffness = 0.2;
-  const damping = 0.8;
+  const stiffness = 0.15;
+  const damping = 0.65;
 
   document.addEventListener('mousemove', function(e) {
     mouseX = e.clientX;
@@ -59,7 +59,7 @@ document.getElementById('themeToggle').addEventListener('click', () => {
     // Squash & stretch along the direction of travel, scaled by speed.
     const speed = Math.hypot(velX, velY);
     const angle = Math.atan2(velY, velX) * 180 / Math.PI;
-    const stretch = Math.min(speed * 0.01, 0.4);
+    const stretch = Math.min(speed * 0.007, 0.25);
 
     blob.style.left = blobX + 'px';
     blob.style.top = blobY + 'px';
