@@ -46,9 +46,11 @@ nav.site-nav .nav-links a:hover { color: var(--text); text-decoration: none; }
 nav.site-nav .nav-links a.active { color: var(--text); }
 nav.site-nav .nav-links .sep { color: var(--text-faint); user-select: none; font-size: 8px; opacity: 0.3; }
 
-.theme-toggle { position: fixed; top: 24px; right: 24px; background: transparent; border: 1px solid var(--border); padding: 6px; cursor: none; color: var(--text-muted); opacity: 0.4; transition: opacity 0.5s, color 0.5s; z-index: 100; border-radius: 0; }
-.theme-toggle:hover { opacity: 0.8; color: var(--text); }
-.theme-toggle svg { width: 16px; height: 16px; }
+.theme-toggle, .profile-toggle { position: fixed; top: 24px; background: transparent; border: 1px solid var(--border); padding: 6px; cursor: none; color: var(--text-muted); opacity: 0.4; transition: opacity 0.5s, color 0.5s; z-index: 100; border-radius: 0; }
+.theme-toggle { right: 24px; }
+.profile-toggle { left: 24px; }
+.theme-toggle:hover, .profile-toggle:hover { opacity: 0.8; color: var(--text); }
+.theme-toggle svg, .profile-toggle svg { width: 16px; height: 16px; }
 .theme-toggle svg.hidden { display: none; }
 .hidden { display: none; }
 

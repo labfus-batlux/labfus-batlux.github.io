@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Game</title>
-  <link rel="stylesheet" href="shared.css?v=game-theme-2">
+  <link rel="stylesheet" href="shared.css?v=game-profile-1">
   <style>
     .wrap { max-width: 700px; padding-top: 48px; }
     .controls { margin: 16px 0; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
@@ -28,6 +28,12 @@
   </style>
 </head>
 <body>
+  <button class="profile-toggle" id="profileToggle" type="button" title="Print email QR code" aria-label="Print email QR code">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <circle cx="12" cy="8" r="4"></circle>
+      <path d="M4 21v-2a8 8 0 0 1 16 0v2"></path>
+    </svg>
+  </button>
   <button class="theme-toggle" id="themeToggle" title="Toggle theme">
     <svg id="sunIcon" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <circle cx="12" cy="12" r="5"></circle>
@@ -68,6 +74,7 @@
   <script>
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
+    const profileToggle = document.getElementById('profileToggle');
     const startBtn = document.getElementById('startBtn');
     const stopBtn = document.getElementById('stopBtn');
     const clearBtn = document.getElementById('clearBtn');
@@ -126,6 +133,8 @@
 
     let grid = createGrid();
     let qrVisible = true;
+    let qrPrintedRows = emailQrRows.length;
+    let qrAnimationFrame = null;
     let colors = createGrid();
     let sandpileValues = createGrid(); // For sandpile mode
     let running = false;
@@ -168,6 +177,25 @@
           if (line[col] === '1') grid[qrTop + qrPadding + row][qrLeft + qrPadding + col] = 1;
         }
       });
+    }
+
+    function hideEmailQr() {
+      qrVisible = false;
+      if (qrAnimationFrame !== null) {
+        cancelAnimationFrame(qrAnimationFrame);
+        qrAnimationFrame = null;
+      }
+    }
+
+    function drawQrRow(row) {
+      const line = emailQrRows[row];
+      ctx.fillStyle = '#000';
+      for (let col = 0; col < line.length; col++) {
+        if (line[col] === '1') {
+          ctx.fillRect((qrLeft + qrPadding + col) * cellSize,
+                       (qrTop + qrPadding + row) * cellSize, cellSize, cellSize);
+        }
+      }
     }
 
     function updateInstructions() {
@@ -240,15 +268,7 @@
       if (qrVisible) {
         ctx.fillStyle = '#fff';
         ctx.fillRect(qrLeft * cellSize, qrTop * cellSize, qrPanelSize * cellSize, qrPanelSize * cellSize);
-        ctx.fillStyle = '#000';
-        emailQrRows.forEach((line, row) => {
-          for (let col = 0; col < line.length; col++) {
-            if (line[col] === '1') {
-              ctx.fillRect((qrLeft + qrPadding + col) * cellSize,
-                           (qrTop + qrPadding + row) * cellSize, cellSize, cellSize);
-            }
-          }
-        });
+        for (let row = 0; row < qrPrintedRows; row++) drawQrRow(row);
       }
 
       // Draw ants
@@ -569,7 +589,7 @@
 
     function start() {
       if (!running) {
-        qrVisible = false;
+        hideEmailQr();
         drawGrid();
         running = true;
         startBtn.disabled = true;
@@ -585,6 +605,36 @@
       stopBtn.disabled = true;
       gameButtons.forEach(btn => btn.disabled = false);
       clearInterval(intervalId);
+    }
+
+    function reprintEmailQr() {
+      stop();
+      hideEmailQr();
+      grid = createGrid();
+      colors = createGrid();
+      sandpileValues = createGrid();
+      gameMode = 'conway';
+      generation = 0;
+      generationDisplay.textContent = generation;
+      setActiveGameButton(conwayBtn);
+      updateInstructions();
+      seedEmailQr();
+      qrVisible = true;
+      qrPrintedRows = 0;
+      drawGrid();
+
+      const printDuration = 250;
+      let printStartedAt = null;
+      function printFrame(now) {
+        if (!qrVisible) return;
+        if (printStartedAt === null) printStartedAt = now;
+        const targetRows = Math.min(emailQrRows.length,
+          Math.max(1, Math.ceil((now - printStartedAt) / printDuration * emailQrRows.length)));
+        while (qrPrintedRows < targetRows) drawQrRow(qrPrintedRows++);
+        qrAnimationFrame = qrPrintedRows < emailQrRows.length
+          ? requestAnimationFrame(printFrame) : null;
+      }
+      qrAnimationFrame = requestAnimationFrame(printFrame);
     }
 
     function updateSpeed() {
@@ -624,7 +674,7 @@
     }
 
     function setActiveGameButton(activeBtn) {
-      qrVisible = false;
+      hideEmailQr();
       gameButtons.forEach(btn => {
         btn.classList.remove('active');
         // Only disable other buttons if running
@@ -1002,7 +1052,7 @@
     }
 
     function toggleCell(row, col) {
-      qrVisible = false;
+      hideEmailQr();
       if (gameMode === 'conway') {
         grid[row][col] = grid[row][col] === 1 ? 0 : 1;
       } else if (gameMode === 'go') {
@@ -1104,6 +1154,7 @@
       lastCell = { row: -1, col: -1 };
     });
 
+    profileToggle.addEventListener('click', reprintEmailQr);
     startBtn.addEventListener('click', start);
     stopBtn.addEventListener('click', stop);
     clearBtn.addEventListener('click', clear);
