@@ -4,14 +4,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Game</title>
-  <link rel="stylesheet" href="shared.css">
+  <link rel="stylesheet" href="shared.css?v=game-theme-2">
   <style>
     .wrap { max-width: 700px; padding-top: 48px; }
     .controls { margin: 16px 0; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-    button { padding: 8px 20px; background: transparent; color: var(--text); border: 1px solid var(--border); cursor: pointer; font-size: 13px; font-family: 'EB Garamond', serif; transition: border-color 0.4s, color 0.4s; border-radius: 0; }
+    button { padding: 8px 20px; background: transparent; color: var(--text); border: 1px solid var(--border); cursor: none; font-size: 13px; font-family: 'EB Garamond', serif; transition: border-color 0.4s, color 0.4s; border-radius: 0; }
     button:hover { border-color: var(--text-muted); }
     button:disabled { opacity: 0.3; cursor: not-allowed; }
-    button.active { border-color: #5E8B7E; color: #5E8B7E; }
+    button.active { border-color: var(--text); color: var(--text); }
     #startBtn { border-color: var(--border); color: var(--text); }
     #startBtn:hover { border-color: var(--text-muted); }
     #stopBtn { border-color: var(--border); color: var(--text); }
@@ -20,11 +20,11 @@
     #clearBtn:hover { border-color: var(--text-muted); }
     #randomBtn { border-color: var(--border); color: var(--text); }
     #randomBtn:hover { border-color: var(--text-muted); }
-    #canvas { border: 1px solid var(--border); cursor: crosshair; display: block; margin: 16px 0; }
+    #canvas { border: 1px solid var(--border); cursor: none; display: block; margin: 16px 0; }
     .info { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-muted); margin: 8px 0; opacity: 0.5; }
-    #speedSlider { -webkit-appearance: none; appearance: none; width: 100px; height: 4px; background: var(--border); outline: none; border-radius: 0; vertical-align: middle; cursor: pointer; }
-    #speedSlider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 12px; height: 12px; background: #8A7E72; cursor: pointer; border-radius: 0; border: none; }
-    #speedSlider::-moz-range-thumb { width: 12px; height: 12px; background: #8A7E72; cursor: pointer; border-radius: 0; border: none; }
+    #speedSlider { -webkit-appearance: none; appearance: none; width: 100px; height: 4px; background: var(--border); outline: none; border-radius: 0; vertical-align: middle; cursor: none; }
+    #speedSlider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 12px; height: 12px; background: var(--text); cursor: none; border-radius: 0; border: none; }
+    #speedSlider::-moz-range-thumb { width: 12px; height: 12px; background: var(--text); cursor: none; border-radius: 0; border: none; }
   </style>
 </head>
 <body>
@@ -64,7 +64,7 @@
 
   </main>
 
-  <script src="shared.js"></script>
+  <script src="shared.js?v=game-theme-2"></script>
   <script>
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
@@ -140,6 +140,7 @@
     function drawGrid() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const borderColor = getComputedStyle(document.documentElement).getPropertyValue('--border').trim();
+      const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text').trim();
 
       for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
@@ -173,24 +174,17 @@
               ctx.fillStyle = '#E85D3A';
               ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
             }
-          } else if (grid[i][j] === 1 || grid[i][j] > 0) {
+            } else if (grid[i][j] === 1 || grid[i][j] > 0) {
             if (gameMode === 'go' && colors[i][j]) {
               ctx.fillStyle = colors[i][j];
-              if (colors[i][j] === '#fff') {
-                ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
-                ctx.strokeStyle = '#333';
-                ctx.lineWidth = 1;
-                ctx.strokeRect(j * cellSize, i * cellSize, cellSize, cellSize);
-                ctx.lineWidth = 1;
-                ctx.strokeStyle = borderColor;
-              } else {
-                ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
-              }
+              ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+              ctx.strokeStyle = textColor;
+              ctx.strokeRect(j * cellSize, i * cellSize, cellSize, cellSize);
             } else if (gameMode === 'tetris' && colors[i][j]) {
               ctx.fillStyle = colors[i][j];
               ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
             } else {
-              ctx.fillStyle = '#5E8B7E';
+              ctx.fillStyle = textColor;
               ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
             }
           }
@@ -1057,6 +1051,8 @@
     sandpileBtn.addEventListener('click', applySandpile);
     wireworldBtn.addEventListener('click', applyWireworld);
     speedSlider.addEventListener('change', updateSpeed);
+
+    window.addEventListener('themechange', drawGrid);
 
     // Initial draw
     updateInstructions();
