@@ -21,11 +21,6 @@
     #randomBtn { border-color: var(--border); color: var(--text); }
     #randomBtn:hover { border-color: var(--text-muted); }
     #canvas { border: 1px solid var(--border); cursor: none; display: block; margin: 16px 0; }
-    #canvas.grid-pulse { animation: grid-pulse 240ms ease-in-out both; }
-    @keyframes grid-pulse {
-      0%, 32%, 64%, 100% { opacity: 1; }
-      16%, 48% { opacity: 0.12; }
-    }
     .info { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-muted); margin: 8px 0; opacity: 0.5; }
     #speedSlider { -webkit-appearance: none; appearance: none; width: 100px; height: 4px; background: var(--border); outline: none; border-radius: 0; vertical-align: middle; cursor: none; }
     #speedSlider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 12px; height: 12px; background: var(--text); cursor: none; border-radius: 0; border: none; }
@@ -138,7 +133,6 @@
 
     let grid = createGrid();
     let qrAnimationFrame = null;
-    let qrPulseTimeout = null;
     let colors = createGrid();
     let sandpileValues = createGrid(); // For sandpile mode
     let running = false;
@@ -186,16 +180,28 @@
       }
     }
 
+    function carveEmailQrRow(row) {
+      const line = emailQrRows[row];
+      for (let col = 0; col < line.length; col++) {
+        if (line[col] === '1') grid[qrTop + qrPadding + row][qrLeft + qrPadding + col] = 0;
+      }
+    }
+
+    function setPositiveQrRow(row) {
+      const qrRow = row - qrTop - qrPadding;
+      for (let col = 0; col < cols; col++) {
+        const qrCol = col - qrLeft - qrPadding;
+        grid[row][col] = qrRow >= 0 && qrRow < emailQrRows.length &&
+          qrCol >= 0 && qrCol < emailQrRows.length &&
+          emailQrRows[qrRow][qrCol] === '1' ? 1 : 0;
+      }
+    }
+
     function stopQrPrint() {
       if (qrAnimationFrame !== null) {
         cancelAnimationFrame(qrAnimationFrame);
         qrAnimationFrame = null;
       }
-      if (qrPulseTimeout !== null) {
-        clearTimeout(qrPulseTimeout);
-        qrPulseTimeout = null;
-      }
-      canvas.classList.remove('grid-pulse');
     }
 
     function updateInstructions() {
@@ -611,7 +617,6 @@
       generationDisplay.textContent = generation;
       setActiveGameButton(conwayBtn);
       updateInstructions();
-      drawGrid();
 
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         seedEmailQr();
@@ -619,26 +624,43 @@
         return;
       }
 
-      const printDuration = 250;
+      grid[0].fill(1);
+      drawGrid();
+      const fillDuration = 140;
+      const carveStart = fillDuration + 60;
+      const carveDuration = 170;
+      const positiveStart = carveStart + carveDuration + 90;
+      const positiveDuration = 250;
       let printStartedAt = null;
-      let printedRows = 0;
+      let filledRows = 1;
+      let carvedRows = 0;
+      let positiveRows = 0;
       function printFrame(now) {
         if (printStartedAt === null) printStartedAt = now;
-        const targetRows = Math.min(emailQrRows.length,
-          Math.max(1, Math.ceil((now - printStartedAt) / printDuration * emailQrRows.length)));
-        while (printedRows < targetRows) seedEmailQrRow(printedRows++);
-        drawGrid();
-        qrAnimationFrame = printedRows < emailQrRows.length
+        const elapsed = now - printStartedAt;
+        const fillTarget = Math.min(rows, Math.ceil(elapsed / fillDuration * rows));
+        const carveTarget = Math.min(emailQrRows.length,
+          Math.max(0, Math.ceil((elapsed - carveStart) / carveDuration * emailQrRows.length)));
+        const positiveTarget = Math.min(rows,
+          Math.max(0, Math.ceil((elapsed - positiveStart) / positiveDuration * rows)));
+        let changed = false;
+        while (filledRows < fillTarget) {
+          grid[filledRows++].fill(1);
+          changed = true;
+        }
+        while (carvedRows < carveTarget) {
+          carveEmailQrRow(carvedRows++);
+          changed = true;
+        }
+        while (positiveRows < positiveTarget) {
+          setPositiveQrRow(positiveRows++);
+          changed = true;
+        }
+        if (changed) drawGrid();
+        qrAnimationFrame = positiveRows < rows
           ? requestAnimationFrame(printFrame) : null;
       }
-      // Two quick grid blinks cue the row-by-row print.
-      void canvas.offsetWidth;
-      canvas.classList.add('grid-pulse');
-      qrPulseTimeout = setTimeout(() => {
-        qrPulseTimeout = null;
-        canvas.classList.remove('grid-pulse');
-        qrAnimationFrame = requestAnimationFrame(printFrame);
-      }, 240);
+      qrAnimationFrame = requestAnimationFrame(printFrame);
     }
 
     function updateSpeed() {
