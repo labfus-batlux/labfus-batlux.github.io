@@ -21,6 +21,11 @@
     #randomBtn { border-color: var(--border); color: var(--text); }
     #randomBtn:hover { border-color: var(--text-muted); }
     #canvas { border: 1px solid var(--border); cursor: none; display: block; margin: 16px 0; }
+    #canvas.grid-pulse { animation: grid-pulse 240ms ease-in-out both; }
+    @keyframes grid-pulse {
+      0%, 32%, 64%, 100% { opacity: 1; }
+      16%, 48% { opacity: 0.12; }
+    }
     .info { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-muted); margin: 8px 0; opacity: 0.5; }
     #speedSlider { -webkit-appearance: none; appearance: none; width: 100px; height: 4px; background: var(--border); outline: none; border-radius: 0; vertical-align: middle; cursor: none; }
     #speedSlider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 12px; height: 12px; background: var(--text); cursor: none; border-radius: 0; border: none; }
@@ -133,6 +138,7 @@
 
     let grid = createGrid();
     let qrAnimationFrame = null;
+    let qrPulseTimeout = null;
     let colors = createGrid();
     let sandpileValues = createGrid(); // For sandpile mode
     let running = false;
@@ -185,6 +191,11 @@
         cancelAnimationFrame(qrAnimationFrame);
         qrAnimationFrame = null;
       }
+      if (qrPulseTimeout !== null) {
+        clearTimeout(qrPulseTimeout);
+        qrPulseTimeout = null;
+      }
+      canvas.classList.remove('grid-pulse');
     }
 
     function updateInstructions() {
@@ -602,6 +613,12 @@
       updateInstructions();
       drawGrid();
 
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        seedEmailQr();
+        drawGrid();
+        return;
+      }
+
       const printDuration = 250;
       let printStartedAt = null;
       let printedRows = 0;
@@ -614,7 +631,14 @@
         qrAnimationFrame = printedRows < emailQrRows.length
           ? requestAnimationFrame(printFrame) : null;
       }
-      qrAnimationFrame = requestAnimationFrame(printFrame);
+      // Two quick grid blinks cue the row-by-row print.
+      void canvas.offsetWidth;
+      canvas.classList.add('grid-pulse');
+      qrPulseTimeout = setTimeout(() => {
+        qrPulseTimeout = null;
+        canvas.classList.remove('grid-pulse');
+        qrAnimationFrame = requestAnimationFrame(printFrame);
+      }, 240);
     }
 
     function updateSpeed() {
