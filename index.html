@@ -3,213 +3,1064 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Charlie Sands</title>
-  <meta name="description" content="Charlie Sands" />
+  <title>Game</title>
   <link rel="stylesheet" href="shared.css">
   <style>
-    .header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; gap: 16px; }
-    .header-title h1 { margin: 0; font-family: 'Cormorant', serif; font-size: 32px; font-weight: 300; text-transform: lowercase; letter-spacing: 0.05em; line-height: 1.2; }
-    .contact-info { margin: 12px 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-muted); opacity: 0.5; }
-    .contact-info a { color: var(--text-muted); }
-    .contact-info a:hover { color: var(--text); text-decoration: none; }
-    .copy-button-container { position: relative; flex-shrink: 0; }
-    .copy-button-group { display: flex; border: 1px solid var(--border); overflow: hidden; opacity: 0.4; transition: opacity 0.5s; }
-    .copy-button-group:hover { opacity: 0.8; }
-    .copy-btn { display: flex; align-items: center; gap: 8px; padding: 8px 14px; background: transparent; border: none; color: var(--text); font-size: 11px; font-family: 'IBM Plex Mono', monospace; cursor: pointer; transition: background 0.4s; }
-    .copy-btn:hover { background: var(--btn-hover); }
-    .copy-btn svg { width: 14px; height: 14px; }
-    .dropdown-toggle { display: flex; align-items: center; padding: 8px 10px; background: transparent; border: none; border-left: 1px solid var(--border); color: var(--text); cursor: pointer; transition: background 0.4s; }
-    .dropdown-toggle:hover { background: var(--btn-hover); }
-    .dropdown-toggle svg { width: 14px; height: 14px; }
-    .dropdown-menu { position: absolute; top: 100%; right: 0; margin-top: 4px; background: var(--dropdown-bg); border: 1px solid var(--border); box-shadow: 0 4px 16px var(--dropdown-shadow); display: none; min-width: 220px; z-index: 100; overflow: hidden; }
-    .dropdown-menu.open { display: block; }
-    .dropdown-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; background: transparent; border: none; color: var(--text); font-size: 12px; font-family: 'IBM Plex Mono', monospace; cursor: pointer; width: 100%; text-align: left; transition: background 0.4s; }
-    .dropdown-item:hover { background: var(--btn-hover); }
-    .dropdown-item svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px; }
-    .dropdown-item-content { display: flex; flex-direction: column; }
-    .dropdown-item-title { font-weight: 400; }
-    .dropdown-item-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-    .copy-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--dropdown-bg); color: var(--text); padding: 10px 20px; border: 1px solid var(--border); font-size: 12px; font-family: 'IBM Plex Mono', monospace; opacity: 0; transition: opacity 0.4s; pointer-events: none; }
-    .copy-toast.show { opacity: 1; }
-    #content h1 { font-family: 'Cormorant', serif; font-size: 24px; margin: 0 0 20px; font-weight: 300; text-transform: lowercase; }
-    #content h2 { font-family: 'Cormorant', serif; font-size: 18px; font-weight: 400; text-transform: lowercase; margin: 48px 0 16px; color: var(--text); padding-bottom: 8px; border-bottom: 1px solid var(--border); }
-    #content h3 { font-family: 'Cormorant', serif; font-size: 16px; margin: 32px 0 12px; font-weight: 400; text-transform: lowercase; color: var(--text); }
-    #content p { margin: 12px 0; }
-    #content strong { font-weight: 500; }
-    #content ul { list-style: none; padding-left: 20px; margin: 12px 0; }
-    #content li { margin: 6px 0; position: relative; }
-    #content li::before { content: '–'; position: absolute; left: -16px; color: var(--text-faint); }
-    #content ul ul { padding-left: 20px; }
-    #content ul ul li::before { content: '·'; color: var(--text-faint); }
+    .wrap { max-width: 700px; padding-top: 48px; }
+    .controls { margin: 16px 0; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    button { padding: 8px 20px; background: transparent; color: var(--text); border: 1px solid var(--border); cursor: pointer; font-size: 13px; font-family: 'EB Garamond', serif; transition: border-color 0.4s, color 0.4s; border-radius: 0; }
+    button:hover { border-color: var(--text-muted); }
+    button:disabled { opacity: 0.3; cursor: not-allowed; }
+    button.active { border-color: #5E8B7E; color: #5E8B7E; }
+    #startBtn { border-color: var(--border); color: var(--text); }
+    #startBtn:hover { border-color: var(--text-muted); }
+    #stopBtn { border-color: var(--border); color: var(--text); }
+    #stopBtn:hover { border-color: var(--text-muted); }
+    #clearBtn { border-color: var(--border); color: var(--text); }
+    #clearBtn:hover { border-color: var(--text-muted); }
+    #randomBtn { border-color: var(--border); color: var(--text); }
+    #randomBtn:hover { border-color: var(--text-muted); }
+    #canvas { border: 1px solid var(--border); cursor: crosshair; display: block; margin: 16px 0; }
+    .info { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-muted); margin: 8px 0; opacity: 0.5; }
+    #speedSlider { -webkit-appearance: none; appearance: none; width: 100px; height: 4px; background: var(--border); outline: none; border-radius: 0; vertical-align: middle; cursor: pointer; }
+    #speedSlider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 12px; height: 12px; background: #8A7E72; cursor: pointer; border-radius: 0; border: none; }
+    #speedSlider::-moz-range-thumb { width: 12px; height: 12px; background: #8A7E72; cursor: pointer; border-radius: 0; border: none; }
   </style>
 </head>
 <body>
   <button class="theme-toggle" id="themeToggle" title="Toggle theme">
     <svg id="sunIcon" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <circle cx="12" cy="12" r="5"></circle>
-      <line x1="12" y1="1" x2="12" y2="3"></line>
-      <line x1="12" y1="21" x2="12" y2="23"></line>
-      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-      <line x1="1" y1="12" x2="3" y2="12"></line>
-      <line x1="21" y1="12" x2="23" y2="12"></line>
-      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+      <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
     </svg>
     <svg id="moonIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
     </svg>
   </button>
-
-  <div class="nav-bar">
-    <nav class="site-nav">
-      <a class="site-name" href="index.html">Charlie Sands</a>
-      <div class="nav-links">
-        <a href="index.html" class="active">CV</a><span class="sep">·</span>
-        <a href="pictures/index.html">Gestures</a><span class="sep">·</span>
-        <a href="game/index.html">Game</a>
-      </div>
-    </nav>
-  </div>
-
   <main class="wrap">
-    <div class="header-row">
-      <div class="header-title">
-        <p class="contact-info"><a href="mailto:cs@charliesands.com">cs@charliesands.com</a></p>
-      </div>
-      <div class="copy-button-container">
-        <div class="copy-button-group">
-          <button class="copy-btn" id="copyBtn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-            </svg>
-            Copy page
-          </button>
-          <button class="dropdown-toggle" id="dropdownToggle">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </button>
-        </div>
-        <div class="dropdown-menu" id="dropdownMenu">
-          <button class="dropdown-item" id="copyMenuItem">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-            </svg>
-            <span class="dropdown-item-content">
-              <span class="dropdown-item-title">Copy page</span>
-              <span class="dropdown-item-desc">Copy page as Markdown</span>
-            </span>
-          </button>
-          <button class="dropdown-item" id="viewMarkdownItem">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-            </svg>
-            <span class="dropdown-item-content">
-              <span class="dropdown-item-title">View as Markdown ↗</span>
-              <span class="dropdown-item-desc">View this page as plain text</span>
-            </span>
-          </button>
-        </div>
-      </div>
+    <div class="controls">
+      <button id="startBtn">Start</button>
+      <button id="stopBtn" disabled>Stop</button>
+      <button id="clearBtn">Clear</button>
+      <button id="randomBtn">Random</button>
+      <span class="info">Speed: <input type="range" id="speedSlider" min="1" max="20" value="10"></span>
+      <span class="info">Generation: <span id="generation">0</span></span>
+    </div>
+    <div class="controls">
+      <button id="conwayBtn" class="active">Conway</button>
+      <button id="goBtn">Go!</button>
+      <button id="tetrisBtn">Tetris</button>
+      <button id="antBtn">Langton's Ant</button>
+      <button id="sandpileBtn">Sandpile</button>
+      <button id="wireworldBtn">Wireworld</button>
     </div>
 
-    <div id="content"></div>
-    <div id="copyToast" class="copy-toast">Copied to clipboard</div>
+    <canvas id="canvas" width="600" height="400"></canvas>
+
+    <p class="info" id="instructions" hidden>Click cells to toggle them. Press Start to begin simulation.</p>
+
   </main>
 
   <script src="shared.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
-    // Fallback content for local file:// access
-    const fallbackMarkdown = `# Charlie Sands
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const randomBtn = document.getElementById('randomBtn');
+    const conwayBtn = document.getElementById('conwayBtn');
+    const goBtn = document.getElementById('goBtn');
+    const tetrisBtn = document.getElementById('tetrisBtn');
+    const antBtn = document.getElementById('antBtn');
+    const sandpileBtn = document.getElementById('sandpileBtn');
+    const wireworldBtn = document.getElementById('wireworldBtn');
+    const generationDisplay = document.getElementById('generation');
+    const speedSlider = document.getElementById('speedSlider');
+    const instructionsDisplay = document.getElementById('instructions');
 
-*cs@charliesands.com*
+    const gameButtons = [conwayBtn, goBtn, tetrisBtn, antBtn, sandpileBtn, wireworldBtn];
 
-## Experience
+    const cellSize = 10;
+    const cols = canvas.width / cellSize;
+    const rows = canvas.height / cellSize;
 
-**Foresight Data Machines** · Contractor · 2026
+    let grid = createGrid();
+    let colors = createGrid();
+    let sandpileValues = createGrid(); // For sandpile mode
+    let running = false;
+    let generation = 0;
+    let intervalId = null;
+    let gameMode = 'conway'; // 'conway', 'go', 'tetris', 'ant', 'sandpile', 'wireworld'
+    let isMouseDown = false;
+    let lastCell = { row: -1, col: -1 };
 
-- Created a business plan to fund and operationalise the UK's most strategically critical large scale steel mill.
-- Worked with senior officials at the Department of Business and Trade and No. 10.
-
-**Seamflow** · Contractor · 2026
-
-- Created business plan to verticalise a £5M seed stage startup, working directly with CEO.
-
-**Fuse Energy** · Snr. Operations Manager · 2023-2026
-
-- Employee 20 at one of the UK's fastest growing startups, working directly with COO and CEO.
-- End-to-end ownership of gas business:
-    - Worked across engineering, design, trading, compliance, finance, and operations to build and scale a revenue stream responsible for £300M in ARR.
-    - Obtained licenses to supply and ship gas in the UK. These were the first supply licenses granted to an energy supplier in over 4 years.
-    - Negotiated contracts across all consumables and service providers.
-    - Wrote product, engineering, and operations specs defining data architecture and business logic.
-- Interviewed and hired 100+ new staff.
-- Designed scalable routing and scheduling tool for DER installation business.
-
-## Education
-
-- **NYU** · Politics & Aesthetics · 2020–2023
-- **Pratt Institute** · Fine Art · 2018–2019
-
-## Qualifications
-
-- Licensed Emergency Medical Technician · State of New York`;
-
-    let markdownText = '';
-
-    function renderMarkdown(text) {
-      markdownText = text;
-      // Skip the title line and contact line since we show title in header
-      const lines = text.split('\n');
-      const contentWithoutTitle = lines.slice(4).join('\n');
-      document.getElementById('content').innerHTML = marked.parse(contentWithoutTitle);
+    // Ant state - array of 5 ants
+    let ants = [];
+    for (let i = 0; i < 5; i++) {
+      ants.push({ row: 0, col: 0, dir: 0 }); // dir: 0=up, 1=right, 2=down, 3=left
     }
 
-    // Try to fetch cv.md, fall back to embedded content
-    fetch('cv.md')
-      .then(response => {
-        if (!response.ok) throw new Error('Not found');
-        return response.text();
-      })
-      .then(renderMarkdown)
-      .catch(() => renderMarkdown(fallbackMarkdown));
+    // Two colors for Go stones
+    const goColors = ['#111', '#fff'];
 
-    // Copy to clipboard function
-    function copyToClipboard(text) {
-      navigator.clipboard.writeText(text).then(() => {
-        const toast = document.getElementById('copyToast');
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 2000);
+    // Tetris colors — warm but vivid
+    const tetrisColors = [
+      '#4E9A85', '#C2785C', '#7BAE58', '#D4A24E',
+      '#8B6BBF', '#55A5B8', '#CF6E7A', '#A08C4A'
+    ];
+
+    // Wireworld colors
+    const wireworldColors = {
+      empty: 0,
+      conductor: 1,
+      electronHead: 2,
+      electronTail: 3
+    };
+
+    function createGrid() {
+      return Array(rows).fill(null).map(() => Array(cols).fill(0));
+    }
+
+    function updateInstructions() {
+      const instructions = {
+        'conway': 'Conway\'s Game of Life: Click cells to toggle them. Living cells with 2-3 neighbors survive, dead cells with 3 neighbors become alive. Press Start to evolve.',
+        'go': 'Go: Click to place black or white stones. Groups without liberties (adjacent empty spaces) are removed. Press Start is disabled for this mode.',
+        'tetris': 'Tetris: Click to place colored blocks. Connected shapes fall down and complete rows are cleared. Press Start to drop pieces.',
+        'ant': 'Langton\'s Ant: Click cells to set initial pattern. Five ants follow rules: turn right on white cells, left on black cells, then flip the cell color and move forward. Press Start to watch.',
+        'sandpile': 'Sandpile: Click cells to add grains of sand (values 1-8). Cells with 4+ grains topple, distributing one grain to each neighbor. Press Start to cascade.',
+        'wireworld': 'Wireworld: Click to toggle conductors (yellow). Electron heads (blue) become tails (red), tails become conductors. Conductors become heads if 1-2 neighboring heads exist. Press Start to simulate.'
+      };
+      instructionsDisplay.textContent = instructions[gameMode] || instructions['conway'];
+    }
+
+    function drawGrid() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const borderColor = getComputedStyle(document.documentElement).getPropertyValue('--border').trim();
+
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          ctx.strokeStyle = borderColor;
+          ctx.strokeRect(j * cellSize, i * cellSize, cellSize, cellSize);
+
+          if (gameMode === 'sandpile') {
+            const val = sandpileValues[i][j];
+            if (val > 0) {
+              const t = Math.min(val / 8, 1);
+              const r = Math.round(94 + t * (94));
+              const g = Math.round(139 + t * (-13));
+              const b = Math.round(126 + t * (-26));
+              ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+              ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+              if (val < 10) {
+                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+                ctx.font = '8px monospace';
+                ctx.fillText(val, j * cellSize + 2, i * cellSize + 8);
+              }
+            }
+          } else if (gameMode === 'wireworld') {
+            const val = grid[i][j];
+            if (val === wireworldColors.conductor) {
+              ctx.fillStyle = '#B8A88A';
+              ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+            } else if (val === wireworldColors.electronHead) {
+              ctx.fillStyle = '#3DE8C5';
+              ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+            } else if (val === wireworldColors.electronTail) {
+              ctx.fillStyle = '#E85D3A';
+              ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+            }
+          } else if (grid[i][j] === 1 || grid[i][j] > 0) {
+            if (gameMode === 'go' && colors[i][j]) {
+              ctx.fillStyle = colors[i][j];
+              if (colors[i][j] === '#fff') {
+                ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(j * cellSize, i * cellSize, cellSize, cellSize);
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = borderColor;
+              } else {
+                ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+              }
+            } else if (gameMode === 'tetris' && colors[i][j]) {
+              ctx.fillStyle = colors[i][j];
+              ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+            } else {
+              ctx.fillStyle = '#5E8B7E';
+              ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+            }
+          }
+        }
+      }
+
+      // Draw ants
+      if (gameMode === 'ant') {
+        const antColors = ['#5E8B7E', '#8A7E72', '#A0896C', '#7B9E91', '#C4B49A'];
+        ants.forEach((ant, idx) => {
+          ctx.fillStyle = antColors[idx % antColors.length];
+          ctx.beginPath();
+          ctx.arc(ant.col * cellSize + cellSize / 2, ant.row * cellSize + cellSize / 2, cellSize / 3, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
+    }
+
+    function countNeighbors(row, col) {
+      let count = 0;
+      for (let i = -1; i <= 1; i++) {
+        for (let j = -1; j <= 1; j++) {
+          if (i === 0 && j === 0) continue;
+          const newRow = (row + i + rows) % rows;
+          const newCol = (col + j + cols) % cols;
+          count += grid[newRow][newCol];
+        }
+      }
+      return count;
+    }
+
+    function nextGeneration() {
+      if (gameMode === 'conway') {
+        nextConway();
+      } else if (gameMode === 'tetris') {
+        nextTetris();
+      } else if (gameMode === 'ant') {
+        nextAnt();
+      } else if (gameMode === 'sandpile') {
+        nextSandpile();
+      } else if (gameMode === 'wireworld') {
+        nextWireworld();
+      }
+      generation++;
+      generationDisplay.textContent = generation;
+      drawGrid();
+    }
+
+    function nextConway() {
+      const newGrid = createGrid();
+
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          const neighbors = countNeighbors(i, j);
+          const cell = grid[i][j];
+
+          if (cell === 1 && (neighbors === 2 || neighbors === 3)) {
+            newGrid[i][j] = 1;
+          } else if (cell === 0 && neighbors === 3) {
+            newGrid[i][j] = 1;
+          }
+        }
+      }
+
+      grid = newGrid;
+    }
+
+    function nextTetris() {
+      // Identify all connected shapes (not just by color, but by connectivity)
+      const visited = createGrid();
+      const shapes = [];
+
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          if (grid[i][j] === 1 && visited[i][j] === 0) {
+            const shapeCells = [];
+            const color = colors[i][j];
+            floodFillTetrisShape(i, j, color, visited, shapeCells);
+            shapes.push({ cells: shapeCells, color: color });
+          }
+        }
+      }
+
+      // Build new grid by checking each shape independently
+      const newGrid = createGrid();
+      const newColors = createGrid();
+      let anyShapeMoved = false;
+
+      // Sort shapes by their lowest row (process from bottom to top)
+      shapes.sort((a, b) => {
+        const maxRowA = Math.max(...a.cells.map(([r, c]) => r));
+        const maxRowB = Math.max(...b.cells.map(([r, c]) => r));
+        return maxRowB - maxRowA;
+      });
+
+      for (const shape of shapes) {
+        const shapeCells = shape.cells;
+        const color = shape.color;
+        let canMoveDown = true;
+
+        // Check if entire shape can move down
+        for (const [r, c] of shapeCells) {
+          if (r === rows - 1) {
+            // Hit bottom
+            canMoveDown = false;
+            break;
+          }
+
+          const cellBelow = [r + 1, c];
+          const isCellBelowInSameShape = shapeCells.some(([sr, sc]) => sr === cellBelow[0] && sc === cellBelow[1]);
+
+          if (!isCellBelowInSameShape) {
+            // Check if the new grid already has something there (from a shape we've already placed)
+            if (newGrid[r + 1][c] === 1) {
+              canMoveDown = false;
+              break;
+            }
+          }
+        }
+
+        // Place shape in new grid
+        if (canMoveDown) {
+          anyShapeMoved = true;
+          // Move shape down
+          for (const [r, c] of shapeCells) {
+            newGrid[r + 1][c] = 1;
+            newColors[r + 1][c] = color;
+          }
+        } else {
+          // Keep shape in place
+          for (const [r, c] of shapeCells) {
+            newGrid[r][c] = 1;
+            newColors[r][c] = color;
+          }
+        }
+      }
+
+      grid = newGrid;
+      colors = newColors;
+
+      // Check for complete rows and remove them
+      let rowsCleared = false;
+      for (let i = rows - 1; i >= 0; i--) {
+        let complete = true;
+        for (let j = 0; j < cols; j++) {
+          if (grid[i][j] === 0) {
+            complete = false;
+            break;
+          }
+        }
+        if (complete) {
+          rowsCleared = true;
+          // Shift all rows above down
+          for (let k = i; k > 0; k--) {
+            for (let j = 0; j < cols; j++) {
+              grid[k][j] = grid[k - 1][j];
+              colors[k][j] = colors[k - 1][j];
+            }
+          }
+          // Clear the top row
+          for (let j = 0; j < cols; j++) {
+            grid[0][j] = 0;
+            colors[0][j] = 0;
+          }
+          // Check the same row again since we shifted down
+          i++;
+        }
+      }
+
+      // Stop if no shapes moved and no rows were cleared
+      if (!anyShapeMoved && generation > 0) {
+        stop();
+      }
+    }
+
+    function floodFillTetrisShape(row, col, color, visited, shapeCells) {
+      if (row < 0 || row >= rows || col < 0 || col >= cols) return;
+      if (visited[row][col] === 1 || grid[row][col] === 0) return;
+      if (colors[row][col] !== color) return;
+
+      visited[row][col] = 1;
+      shapeCells.push([row, col]);
+
+      floodFillTetrisShape(row - 1, col, color, visited, shapeCells);
+      floodFillTetrisShape(row + 1, col, color, visited, shapeCells);
+      floodFillTetrisShape(row, col - 1, color, visited, shapeCells);
+      floodFillTetrisShape(row, col + 1, color, visited, shapeCells);
+    }
+
+    function floodFillIgnoreColor(row, col, visited, shapeCells) {
+      if (row < 0 || row >= rows || col < 0 || col >= cols) return;
+      if (visited[row][col] === 1 || grid[row][col] === 0) return;
+
+      visited[row][col] = 1;
+      shapeCells.push([row, col]);
+
+      floodFillIgnoreColor(row - 1, col, visited, shapeCells);
+      floodFillIgnoreColor(row + 1, col, visited, shapeCells);
+      floodFillIgnoreColor(row, col - 1, visited, shapeCells);
+      floodFillIgnoreColor(row, col + 1, visited, shapeCells);
+    }
+
+    function mergeTouchingShapes() {
+      // After shapes have fallen, merge any shapes that are touching
+      const visited = createGrid();
+
+      // Identify all shapes (groups of connected cells, ignoring color)
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          if (grid[i][j] === 1 && visited[i][j] === 0) {
+            const shapeCells = [];
+            // Flood fill ignoring color differences
+            floodFillIgnoreColor(i, j, visited, shapeCells);
+
+            // Find all unique colors in this shape
+            const colorsInShape = new Set();
+            for (const [r, c] of shapeCells) {
+              colorsInShape.add(colors[r][c]);
+            }
+
+            // If multiple colors exist, unify them to the first color
+            if (colorsInShape.size > 1) {
+              const unifiedColor = colors[shapeCells[0][0]][shapeCells[0][1]];
+              for (const [r, c] of shapeCells) {
+                colors[r][c] = unifiedColor;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    function nextAnt() {
+      // Move each ant according to Langton's ant rules
+      ants.forEach(ant => {
+        // Langton's ant: turn right on white, left on black
+        if (grid[ant.row][ant.col] === 0) {
+          // White cell: turn right, flip to black
+          ant.dir = (ant.dir + 1) % 4;
+          grid[ant.row][ant.col] = 1;
+        } else {
+          // Black cell: turn left, flip to white
+          ant.dir = (ant.dir + 3) % 4;
+          grid[ant.row][ant.col] = 0;
+        }
+
+        // Move forward
+        if (ant.dir === 0) ant.row = (ant.row - 1 + rows) % rows;
+        else if (ant.dir === 1) ant.col = (ant.col + 1) % cols;
+        else if (ant.dir === 2) ant.row = (ant.row + 1) % rows;
+        else if (ant.dir === 3) ant.col = (ant.col - 1 + cols) % cols;
       });
     }
 
-    document.getElementById('copyBtn').addEventListener('click', () => copyToClipboard(markdownText));
+    function nextSandpile() {
+      const newValues = sandpileValues.map(row => [...row]);
+      let changed = false;
 
-    document.getElementById('dropdownToggle').addEventListener('click', (e) => {
-      e.stopPropagation();
-      document.getElementById('dropdownMenu').classList.toggle('open');
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          if (sandpileValues[i][j] >= 4) {
+            changed = true;
+            newValues[i][j] -= 4;
+            if (i > 0) newValues[i - 1][j]++;
+            if (i < rows - 1) newValues[i + 1][j]++;
+            if (j > 0) newValues[i][j - 1]++;
+            if (j < cols - 1) newValues[i][j + 1]++;
+          }
+        }
+      }
+
+      sandpileValues = newValues;
+      if (!changed && generation > 0) {
+        stop();
+      }
+    }
+
+    function nextWireworld() {
+      const newGrid = createGrid();
+
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          const cell = grid[i][j];
+
+          if (cell === wireworldColors.electronHead) {
+            newGrid[i][j] = wireworldColors.electronTail;
+          } else if (cell === wireworldColors.electronTail) {
+            newGrid[i][j] = wireworldColors.conductor;
+          } else if (cell === wireworldColors.conductor) {
+            let headCount = 0;
+            for (let di = -1; di <= 1; di++) {
+              for (let dj = -1; dj <= 1; dj++) {
+                if (di === 0 && dj === 0) continue;
+                const ni = i + di;
+                const nj = j + dj;
+                if (ni >= 0 && ni < rows && nj >= 0 && nj < cols) {
+                  if (grid[ni][nj] === wireworldColors.electronHead) {
+                    headCount++;
+                  }
+                }
+              }
+            }
+            if (headCount === 1 || headCount === 2) {
+              newGrid[i][j] = wireworldColors.electronHead;
+            } else {
+              newGrid[i][j] = wireworldColors.conductor;
+            }
+          }
+        }
+      }
+
+      grid = newGrid;
+    }
+
+    function getSpeed() {
+      // Convert slider value (1-20) to interval time in ms
+      // Higher slider value = faster speed = lower interval
+      // 1 = 500ms (slow), 10 = 100ms (medium), 20 = 25ms (fast)
+      const sliderValue = parseInt(speedSlider.value);
+      return Math.max(25, 525 - sliderValue * 25);
+    }
+
+    function start() {
+      if (!running) {
+        running = true;
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+        gameButtons.forEach(btn => btn.disabled = true);
+        intervalId = setInterval(nextGeneration, getSpeed());
+      }
+    }
+
+    function stop() {
+      running = false;
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      gameButtons.forEach(btn => btn.disabled = false);
+      clearInterval(intervalId);
+    }
+
+    function updateSpeed() {
+      if (running) {
+        clearInterval(intervalId);
+        intervalId = setInterval(nextGeneration, getSpeed());
+      }
+    }
+
+    function clear() {
+      stop();
+      grid = createGrid();
+      colors = createGrid();
+      sandpileValues = createGrid();
+      gameMode = 'conway';
+      generation = 0;
+      generationDisplay.textContent = generation;
+      setActiveGameButton(conwayBtn);
+      drawGrid();
+    }
+
+    function randomize() {
+      stop();
+      grid = createGrid();
+      colors = createGrid();
+      sandpileValues = createGrid();
+      gameMode = 'conway';
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          grid[i][j] = Math.random() > 0.7 ? 1 : 0;
+        }
+      }
+      generation = 0;
+      generationDisplay.textContent = generation;
+      setActiveGameButton(conwayBtn);
+      drawGrid();
+    }
+
+    function setActiveGameButton(activeBtn) {
+      gameButtons.forEach(btn => {
+        btn.classList.remove('active');
+        // Only disable other buttons if running
+        if (running) {
+          btn.disabled = (btn !== activeBtn);
+        } else {
+          btn.disabled = false;
+        }
+      });
+      activeBtn.classList.add('active');
+    }
+
+    function applyConway() {
+      if (running) return;
+
+      // If switching FROM sandpile mode, convert any cells with values to living cells
+      if (gameMode === 'sandpile') {
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            if (sandpileValues[i][j] > 0) {
+              grid[i][j] = 1;
+            }
+          }
+        }
+      }
+
+      // If switching FROM wireworld, convert all non-empty cells to living cells
+      if (gameMode === 'wireworld') {
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            if (grid[i][j] > 0) {
+              grid[i][j] = 1;
+            }
+          }
+        }
+      }
+
+      gameMode = 'conway';
+      colors = createGrid();
+      sandpileValues = createGrid();
+      setActiveGameButton(conwayBtn);
+      startBtn.disabled = false; // Re-enable start for iterative modes
+      updateInstructions();
+      drawGrid();
+    }
+
+    function applyGo() {
+      if (running) return;
+
+      // If switching FROM sandpile mode, convert any cells with values to living cells
+      if (gameMode === 'sandpile') {
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            if (sandpileValues[i][j] > 0) {
+              grid[i][j] = 1;
+            }
+          }
+        }
+      }
+
+      // If switching FROM wireworld, convert all non-empty cells to living cells
+      if (gameMode === 'wireworld') {
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            if (grid[i][j] > 0) {
+              grid[i][j] = 1;
+            }
+          }
+        }
+      }
+
+      // Go mode does not iterate, so disable start button
+      gameMode = 'go';
+      colors = createGrid();
+
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          if (grid[i][j] === 1) {
+            colors[i][j] = goColors[Math.floor(Math.random() * 2)];
+          }
+        }
+      }
+
+      removeGroupsWithoutLiberties();
+      setActiveGameButton(goBtn);
+      startBtn.disabled = true; // Go doesn't iterate
+      updateInstructions();
+      drawGrid();
+    }
+
+    function applyTetris() {
+      if (running) return;
+
+      // If switching FROM sandpile mode, convert any cells with values to living cells
+      if (gameMode === 'sandpile') {
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            if (sandpileValues[i][j] > 0) {
+              grid[i][j] = 1;
+            }
+          }
+        }
+      }
+
+      // If switching FROM wireworld, convert all non-empty cells to living cells
+      if (gameMode === 'wireworld') {
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            if (grid[i][j] > 0) {
+              grid[i][j] = 1;
+            }
+          }
+        }
+      }
+
+      gameMode = 'tetris';
+      colors = createGrid();
+      const visited = createGrid();
+      let colorIndex = 0;
+
+      // Assign colors to all existing living cells based on connected components
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          if (grid[i][j] === 1 && visited[i][j] === 0) {
+            const color = tetrisColors[colorIndex % tetrisColors.length];
+            floodFillColorTetris(i, j, color, visited);
+            colorIndex++;
+          }
+        }
+      }
+
+      setActiveGameButton(tetrisBtn);
+      startBtn.disabled = false; // Re-enable start for iterative modes
+      updateInstructions();
+      drawGrid();
+    }
+
+    function floodFillColorTetris(row, col, color, visited) {
+      const stack = [[row, col]];
+
+      while (stack.length > 0) {
+        const [r, c] = stack.pop();
+
+        if (r < 0 || r >= rows || c < 0 || c >= cols) continue;
+        if (visited[r][c] === 1 || grid[r][c] === 0) continue;
+
+        visited[r][c] = 1;
+        colors[r][c] = color;
+
+        stack.push([r - 1, c]);
+        stack.push([r + 1, c]);
+        stack.push([r, c - 1]);
+        stack.push([r, c + 1]);
+      }
+    }
+
+    function applyAnt() {
+      if (running) return;
+
+      // If switching FROM sandpile mode, convert any cells with values to living cells
+      if (gameMode === 'sandpile') {
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            if (sandpileValues[i][j] > 0) {
+              grid[i][j] = 1;
+            }
+          }
+        }
+      }
+
+      // If switching FROM wireworld, convert all non-empty cells to living cells
+      if (gameMode === 'wireworld') {
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            if (grid[i][j] > 0) {
+              grid[i][j] = 1;
+            }
+          }
+        }
+      }
+
+      gameMode = 'ant';
+
+      // Initialize 5 ants at different positions
+      const livingCells = [];
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          if (grid[i][j] === 1) {
+            livingCells.push([i, j]);
+          }
+        }
+      }
+
+      // Place ants either on living cells or spread them out
+      if (livingCells.length >= 5) {
+        // Randomly select 5 living cells
+        const shuffled = livingCells.sort(() => Math.random() - 0.5);
+        for (let i = 0; i < 5; i++) {
+          ants[i].row = shuffled[i][0];
+          ants[i].col = shuffled[i][1];
+          ants[i].dir = Math.floor(Math.random() * 4);
+        }
+      } else {
+        // Spread ants across the grid
+        for (let i = 0; i < 5; i++) {
+          ants[i].row = Math.floor(rows / 6 * (i + 1));
+          ants[i].col = Math.floor(cols / 2);
+          ants[i].dir = i % 4;
+        }
+      }
+
+      setActiveGameButton(antBtn);
+      startBtn.disabled = false; // Re-enable start for iterative modes
+      updateInstructions();
+      drawGrid();
+    }
+
+    function applySandpile() {
+      if (running) return;
+
+      // If switching FROM sandpile mode, convert any cells with values to living cells
+      if (gameMode === 'sandpile') {
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            if (sandpileValues[i][j] > 0) {
+              grid[i][j] = 1;
+            }
+          }
+        }
+      }
+
+      // If switching FROM wireworld, convert all non-empty cells to living cells
+      if (gameMode === 'wireworld') {
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            if (grid[i][j] > 0) {
+              grid[i][j] = 1;
+            }
+          }
+        }
+      }
+
+      gameMode = 'sandpile';
+      sandpileValues = createGrid();
+
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          if (grid[i][j] === 1 || grid[i][j] > 0) {
+            sandpileValues[i][j] = Math.floor(Math.random() * 8) + 1;
+          }
+        }
+      }
+
+      setActiveGameButton(sandpileBtn);
+      startBtn.disabled = false; // Re-enable start for iterative modes
+      updateInstructions();
+      drawGrid();
+    }
+
+    function applyWireworld() {
+      if (running) return;
+
+      // If switching FROM sandpile mode, convert any cells with values to living cells
+      if (gameMode === 'sandpile') {
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            if (sandpileValues[i][j] > 0) {
+              grid[i][j] = 1;
+            }
+          }
+        }
+      }
+
+      gameMode = 'wireworld';
+
+      // Find connected groups and assign one head and one tail per group
+      const visited = createGrid();
+
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          if (grid[i][j] === 1 && visited[i][j] === 0) {
+            // Find all cells in this group
+            const groupCells = [];
+            findGroupCells(i, j, visited, groupCells);
+
+            // Convert all to conductors first
+            for (const [r, c] of groupCells) {
+              grid[r][c] = wireworldColors.conductor;
+            }
+
+            // Randomly pick one for head and one for tail
+            if (groupCells.length > 0) {
+              const headIdx = Math.floor(Math.random() * groupCells.length);
+              const [headR, headC] = groupCells[headIdx];
+              grid[headR][headC] = wireworldColors.electronHead;
+
+              if (groupCells.length > 1) {
+                let tailIdx = Math.floor(Math.random() * groupCells.length);
+                while (tailIdx === headIdx) {
+                  tailIdx = Math.floor(Math.random() * groupCells.length);
+                }
+                const [tailR, tailC] = groupCells[tailIdx];
+                grid[tailR][tailC] = wireworldColors.electronTail;
+              }
+            }
+          }
+        }
+      }
+
+      setActiveGameButton(wireworldBtn);
+      startBtn.disabled = false; // Re-enable start for iterative modes
+      updateInstructions();
+      drawGrid();
+    }
+
+    function findGroupCells(row, col, visited, groupCells) {
+      if (row < 0 || row >= rows || col < 0 || col >= cols) return;
+      if (visited[row][col] === 1 || grid[row][col] === 0) return;
+
+      visited[row][col] = 1;
+      groupCells.push([row, col]);
+
+      findGroupCells(row - 1, col, visited, groupCells);
+      findGroupCells(row + 1, col, visited, groupCells);
+      findGroupCells(row, col - 1, visited, groupCells);
+      findGroupCells(row, col + 1, visited, groupCells);
+    }
+
+    function getLiberties(row, col, groupColor, visited, groupCells) {
+      if (row < 0 || row >= rows || col < 0 || col >= cols) return 0;
+      if (visited[row][col] === 1) return 0;
+
+      visited[row][col] = 1;
+
+      if (grid[row][col] === 0) {
+        return 1; // Empty space is a liberty
+      }
+
+      // Only continue if same color
+      if (colors[row][col] !== groupColor) {
+        return 0;
+      }
+
+      groupCells.push([row, col]);
+
+      let liberties = 0;
+      liberties += getLiberties(row - 1, col, groupColor, visited, groupCells);
+      liberties += getLiberties(row + 1, col, groupColor, visited, groupCells);
+      liberties += getLiberties(row, col - 1, groupColor, visited, groupCells);
+      liberties += getLiberties(row, col + 1, groupColor, visited, groupCells);
+
+      return liberties;
+    }
+
+    function removeGroupsWithoutLiberties() {
+      const visited = createGrid();
+
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          if (grid[i][j] === 1 && visited[i][j] === 0) {
+            const groupCells = [];
+            const groupColor = colors[i][j];
+            const liberties = getLiberties(i, j, groupColor, visited, groupCells);
+
+            if (liberties === 0) {
+              // Remove this group
+              for (const [r, c] of groupCells) {
+                grid[r][c] = 0;
+                colors[r][c] = 0;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    function toggleCell(row, col) {
+      if (gameMode === 'conway') {
+        grid[row][col] = grid[row][col] === 1 ? 0 : 1;
+      } else if (gameMode === 'go') {
+        if (grid[row][col] === 1) {
+          grid[row][col] = 0;
+          colors[row][col] = 0;
+        } else {
+          grid[row][col] = 1;
+          colors[row][col] = goColors[Math.floor(Math.random() * 2)];
+        }
+      } else if (gameMode === 'tetris') {
+        if (grid[row][col] === 1) {
+          grid[row][col] = 0;
+          colors[row][col] = 0;
+        } else {
+          grid[row][col] = 1;
+          // Check adjacent cells for existing colors
+          let adjacentColor = null;
+          const neighbors = [
+            [row - 1, col], [row + 1, col],
+            [row, col - 1], [row, col + 1]
+          ];
+          for (const [r, c] of neighbors) {
+            if (r >= 0 && r < rows && c >= 0 && c < cols && grid[r][c] === 1 && colors[r][c]) {
+              adjacentColor = colors[r][c];
+              break;
+            }
+          }
+          // Assign adjacent color if found, otherwise random
+          colors[row][col] = adjacentColor || tetrisColors[Math.floor(Math.random() * tetrisColors.length)];
+
+          // Merge touching shapes when user manually connects them
+          mergeTouchingShapes();
+        }
+      } else if (gameMode === 'ant') {
+        grid[row][col] = grid[row][col] === 1 ? 0 : 1;
+      } else if (gameMode === 'sandpile') {
+        if (sandpileValues[row][col] > 0) {
+          sandpileValues[row][col] = 0;
+          grid[row][col] = 0;
+        } else {
+          sandpileValues[row][col] = Math.floor(Math.random() * 8) + 1;
+          grid[row][col] = 1;
+        }
+      } else if (gameMode === 'wireworld') {
+        if (grid[row][col] === 0) {
+          grid[row][col] = wireworldColors.conductor;
+        } else {
+          grid[row][col] = 0;
+        }
+      }
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+      if (running) return;
+      isMouseDown = true;
+
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const col = Math.floor(x / cellSize);
+      const row = Math.floor(y / cellSize);
+
+      if (row >= 0 && row < rows && col >= 0 && col < cols) {
+        toggleCell(row, col);
+        lastCell = { row, col };
+        drawGrid();
+      }
     });
 
-    document.addEventListener('click', () => document.getElementById('dropdownMenu').classList.remove('open'));
+    canvas.addEventListener('mousemove', (e) => {
+      if (!isMouseDown || running) return;
 
-    document.getElementById('copyMenuItem').addEventListener('click', () => {
-      copyToClipboard(markdownText);
-      document.getElementById('dropdownMenu').classList.remove('open');
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const col = Math.floor(x / cellSize);
+      const row = Math.floor(y / cellSize);
+
+      if (row >= 0 && row < rows && col >= 0 && col < cols) {
+        // Only toggle if we've moved to a new cell
+        if (row !== lastCell.row || col !== lastCell.col) {
+          toggleCell(row, col);
+          lastCell = { row, col };
+          drawGrid();
+        }
+      }
     });
 
-    document.getElementById('viewMarkdownItem').addEventListener('click', () => {
-      const blob = new Blob([markdownText], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      window.open(url, '_blank');
-      document.getElementById('dropdownMenu').classList.remove('open');
+    canvas.addEventListener('mouseup', () => {
+      isMouseDown = false;
+      lastCell = { row: -1, col: -1 };
     });
+
+    canvas.addEventListener('mouseleave', () => {
+      isMouseDown = false;
+      lastCell = { row: -1, col: -1 };
+    });
+
+    startBtn.addEventListener('click', start);
+    stopBtn.addEventListener('click', stop);
+    clearBtn.addEventListener('click', clear);
+    randomBtn.addEventListener('click', randomize);
+    conwayBtn.addEventListener('click', applyConway);
+    goBtn.addEventListener('click', applyGo);
+    tetrisBtn.addEventListener('click', applyTetris);
+    antBtn.addEventListener('click', applyAnt);
+    sandpileBtn.addEventListener('click', applySandpile);
+    wireworldBtn.addEventListener('click', applyWireworld);
+    speedSlider.addEventListener('change', updateSpeed);
+
+    // Initial draw
+    updateInstructions();
+    drawGrid();
   </script>
 </body>
 </html>
