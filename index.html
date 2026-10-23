@@ -88,7 +88,44 @@
     const cols = canvas.width / cellSize;
     const rows = canvas.height / cellSize;
 
+    // CIQRCodeGenerator, M correction: mailto:cs@charliesands.com.
+    // Its one-cell border plus three extra cells forms a four-cell quiet zone.
+    const emailQrRows = [
+      '000000000000000000000000000',
+      '011111110001110101011111110',
+      '010000010010001011010000010',
+      '010111010101110111010111010',
+      '010111010111101110010111010',
+      '010111010100110001010111010',
+      '010000010111010011010000010',
+      '011111110101010101011111110',
+      '000000000101010110000000000',
+      '010111110011101100011111000',
+      '011011100000111001011011000',
+      '011101111000001110011100110',
+      '000001000100100011010000110',
+      '000100111111111100111111010',
+      '010100101001010001001001000',
+      '010101011000000110011110110',
+      '010110101110000000100000110',
+      '010000110111111111111101100',
+      '000000000111100101000100000',
+      '011111110010001001010110110',
+      '010000010101100101000100000',
+      '010111010111111011111111000',
+      '010111010101101000110101110',
+      '010111010101001110001001010',
+      '010000010010110011000110010',
+      '011111110100011100010101110',
+      '000000000000000000000000000',
+    ];
+    const qrPadding = 3;
+    const qrPanelSize = emailQrRows.length + qrPadding * 2;
+    const qrLeft = Math.floor((cols - qrPanelSize) / 2);
+    const qrTop = Math.floor((rows - qrPanelSize) / 2);
+
     let grid = createGrid();
+    let qrVisible = true;
     let colors = createGrid();
     let sandpileValues = createGrid(); // For sandpile mode
     let running = false;
@@ -123,6 +160,14 @@
 
     function createGrid() {
       return Array(rows).fill(null).map(() => Array(cols).fill(0));
+    }
+
+    function seedEmailQr() {
+      emailQrRows.forEach((line, row) => {
+        for (let col = 0; col < line.length; col++) {
+          if (line[col] === '1') grid[qrTop + qrPadding + row][qrLeft + qrPadding + col] = 1;
+        }
+      });
     }
 
     function updateInstructions() {
@@ -189,6 +234,21 @@
             }
           }
         }
+      }
+
+      // Show a standard black-on-white QR until the player changes the board.
+      if (qrVisible) {
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(qrLeft * cellSize, qrTop * cellSize, qrPanelSize * cellSize, qrPanelSize * cellSize);
+        ctx.fillStyle = '#000';
+        emailQrRows.forEach((line, row) => {
+          for (let col = 0; col < line.length; col++) {
+            if (line[col] === '1') {
+              ctx.fillRect((qrLeft + qrPadding + col) * cellSize,
+                           (qrTop + qrPadding + row) * cellSize, cellSize, cellSize);
+            }
+          }
+        });
       }
 
       // Draw ants
@@ -509,6 +569,8 @@
 
     function start() {
       if (!running) {
+        qrVisible = false;
+        drawGrid();
         running = true;
         startBtn.disabled = true;
         stopBtn.disabled = false;
@@ -562,6 +624,7 @@
     }
 
     function setActiveGameButton(activeBtn) {
+      qrVisible = false;
       gameButtons.forEach(btn => {
         btn.classList.remove('active');
         // Only disable other buttons if running
@@ -939,6 +1002,7 @@
     }
 
     function toggleCell(row, col) {
+      qrVisible = false;
       if (gameMode === 'conway') {
         grid[row][col] = grid[row][col] === 1 ? 0 : 1;
       } else if (gameMode === 'go') {
@@ -1052,9 +1116,10 @@
     wireworldBtn.addEventListener('click', applyWireworld);
     speedSlider.addEventListener('change', updateSpeed);
 
-    window.addEventListener('themechange', drawGrid);
+    window.addEventListener('themechange', () => requestAnimationFrame(drawGrid));
 
     // Initial draw
+    seedEmailQr();
     updateInstructions();
     drawGrid();
   </script>
